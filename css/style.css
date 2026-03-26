@@ -664,6 +664,7 @@ header.scrolled {
   font-size: 2.5rem;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
 }

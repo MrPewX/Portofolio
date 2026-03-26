@@ -61,11 +61,11 @@ let projectsData = [
 ];
 
 const defaultCaseStudyTemplate = {
-    hook: "<strong>Role:</strong> <br><br><strong>Timeline:</strong> <br><br><strong>Tools:</strong> <br><br><strong>Problem:</strong> ",
-    research: "<strong>User Persona:</strong> <br><br><strong>Competitor Analysis:</strong> <br><br><strong>User Flow:</strong> ",
-    design: "<strong>Wireframes:</strong> <br><br><strong>Design System:</strong> <br><br><strong>High-Fidelity:</strong> ",
-    challenge: "<strong>Tantangan:</strong> <br><br><strong>Solusi:</strong> <br><br><strong>Snippet Kode:</strong><br><pre></pre>",
-    result: "<strong>Fitur Utama:</strong> <br><br><strong>Apa yang Saya Pelajari:</strong> "
+    hook: "<strong>Role:</strong> <br><strong>Timeline:</strong> <br><strong>Tools:</strong> <br><strong>Problem:</strong> ",
+    research: "<strong>User Persona:</strong> <br><strong>Competitor Analysis:</strong> <br><strong>User Flow:</strong> ",
+    design: "<strong>Wireframes:</strong> <br><strong>Design System:</strong> <br><strong>High-Fidelity:</strong> ",
+    challenge: "<strong>Tantangan:</strong> <br><strong>Solusi:</strong> <br><strong>Snippet Kode:</strong><br><pre></pre>",
+    result: "<strong>Fitur Utama:</strong> <br><strong>Apa yang Saya Pelajari:</strong> "
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -119,40 +119,42 @@ async function initContent() {
         }
     });
 
-    // 3. Load projects data
+    // 3. Load projects data - Smart Merge between Drive and Local
+    let combinedProjects = [];
+    const localProjsRaw = localStorage.getItem('portfolio_projects');
+    let localProjects = [];
+    if(localProjsRaw) {
+        try { localProjects = JSON.parse(localProjsRaw); } catch(e) {}
+    }
+
     if (driveData && driveData['projects']) {
-        let savedProjects = driveData['projects'];
-        // Sinkronisasi data lama (Legacy) tanpa caseStudy dengan template default 5-points
-        savedProjects.forEach(sp => {
-            if(!sp.caseStudy || !sp.caseStudy.hook) {
-                const def = projectsData.find(dp => dp.id === sp.id);
-                if(def && def.caseStudy) {
-                    sp.caseStudy = def.caseStudy;
-                } else {
-                    sp.caseStudy = JSON.parse(JSON.stringify(defaultCaseStudyTemplate));
-                }
+        // Ambil data dari drive sebagai base
+        combinedProjects = driveData['projects'];
+        
+        // Cek jika ada item di localProjects yang tidak ada di Drive (project baru gress)
+        localProjects.forEach(lp => {
+            if(!combinedProjects.find(dp => dp.id === lp.id)) {
+                combinedProjects.push(lp);
             }
         });
-        projectsData = savedProjects;
     } else {
-        const localProjs = localStorage.getItem('portfolio_projects');
-        if(localProjs) {
-            try { 
-                let parsed = JSON.parse(localProjs); 
-                parsed.forEach(sp => {
-                    if(!sp.caseStudy || !sp.caseStudy.hook) {
-                        const def = projectsData.find(dp => dp.id === sp.id);
-                        if(def && def.caseStudy) {
-                            sp.caseStudy = def.caseStudy;
-                        } else {
-                            sp.caseStudy = JSON.parse(JSON.stringify(defaultCaseStudyTemplate));
-                        }
-                    }
-                });
-                projectsData = parsed;
-            } 
-            catch(e) { console.error("Error parsing projects"); }
+        combinedProjects = localProjects;
+    }
+
+    // Terakhir, pastikan semua data punya format case study 5-points
+    combinedProjects.forEach(sp => {
+        if(!sp.caseStudy || !sp.caseStudy.hook) {
+            const defSource = projectsData.find(dp => dp.id === sp.id);
+            if(defSource && defSource.caseStudy) {
+                sp.caseStudy = defSource.caseStudy;
+            } else {
+                sp.caseStudy = JSON.parse(JSON.stringify(defaultCaseStudyTemplate));
+            }
         }
+    });
+
+    if(combinedProjects.length > 0) {
+        projectsData = combinedProjects;
     }
 }
 
@@ -371,10 +373,11 @@ function enableEditMode() {
             const proNode = document.getElementById(`proj-pro-${p.id}`);
             if(proNode) p.process = proNode.innerText;
             
-            const lNode = document.getElementById(`proj-link-${p.id}`);
-            if(lNode) p.link = lNode.getAttribute('href'); 
+            const lNode = document.getElementById(`proj-demolink-${p.id}`);
+            if(lNode) p.linkDemo = lNode.getAttribute('href'); 
             
-            p.img = document.getElementById(`proj-img-${p.id}`).src;
+            const imgNode = document.getElementById(`proj-img-${p.id}`);
+            if(imgNode) p.img = imgNode.src;
             
             const tagsCont = document.getElementById(`proj-tags-${p.id}`);
             if(tagsCont) {
