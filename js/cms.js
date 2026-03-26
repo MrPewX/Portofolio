@@ -611,13 +611,14 @@ function renderCaseStudy() {
             }
 
             return `
-                ${isAdmin ? `
-                    <div class="sub-block-controls" style="position:absolute; top:-10px; right:0; z-index:10; display:flex; gap:5px;">
-                        <button class="btn btn-secondary btn-sm" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, -1)"><i class="fas fa-chevron-up"></i></button>
-                        <button class="btn btn-secondary btn-sm" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, 1)"><i class="fas fa-chevron-down"></i></button>
-                        <button class="btn btn-secondary btn-sm" onclick="removeSubBlock(${proj.id}, ${sec.id}, ${bIdx})"><i class="fas fa-trash"></i></button>
-                    </div>
-                ` : ''}
+                <div class="sub-block-wrapper" style="position:relative">
+                    ${isAdmin ? `
+                        <div class="sub-block-controls">
+                            <button class="btn-icon" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, -1)" title="Move Up"><i class="fas fa-chevron-up"></i></button>
+                            <button class="btn-icon" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, 1)" title="Move Down"><i class="fas fa-chevron-down"></i></button>
+                            <button class="btn-icon trash" onclick="removeSubBlock(${proj.id}, ${sec.id}, ${bIdx})" title="Delete Block"><i class="fas fa-trash"></i></button>
+                        </div>
+                    ` : ''}
                     ${blockDisplay}
                 </div>
             `;
@@ -627,12 +628,12 @@ function renderCaseStudy() {
             <div class="glass" style="padding: 2rem; margin-bottom: 2rem;" data-section-id="${sec.id}">
                 ${isAdmin ? `
                     <div class="section-controls mb-3">
-                        <button class="btn btn-secondary btn-sm" onclick="moveCaseSection(${proj.id}, ${sec.id}, -1)"><i class="fas fa-arrow-up"></i></button>
-                        <button class="btn btn-secondary btn-sm" onclick="moveCaseSection(${proj.id}, ${sec.id}, 1)"><i class="fas fa-arrow-down"></i></button>
+                        <button class="btn-icon" onclick="moveCaseSection(${proj.id}, ${sec.id}, -1)" title="Geser ke Atas"><i class="fas fa-arrow-up"></i></button>
+                        <button class="btn-icon" onclick="moveCaseSection(${proj.id}, ${sec.id}, 1)" title="Geser ke Bawah"><i class="fas fa-arrow-down"></i></button>
                         <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'text')">+ Teks</button>
                         <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'code')">+ Kode</button>
                         <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'media')">+ File</button>
-                        <button class="btn btn-secondary btn-sm" style="color:#ff5f56" onclick="removeCaseSection(${proj.id}, ${sec.id})"><i class="fas fa-trash"></i></button>
+                        <button class="btn-icon trash ml-2" onclick="removeCaseSection(${proj.id}, ${sec.id})"><i class="fas fa-trash"></i></button>
                     </div>
                 ` : ''}
                 <h3><i class="${sec.icon || 'fas fa-check-circle'}" style="color:var(--accent-primary)"></i> <span id="cs-title-${sec.id}" contenteditable="${isAdmin}">${sec.title}</span></h3>
@@ -687,10 +688,19 @@ function getFileIcon(filename) {
 }
 
 // ============== SUB-BLOCK ACTIONS ==============
-function addSubBlock(pId, sId, type) {
+function addSubBlock(pId, sId, type, insertAt = -1) {
     const proj = projectsData.find(p => p.id === pId);
     const sec = proj?.caseStudy?.sections?.find(s => s.id === sId);
     if(!sec) return;
+
+    const finalizeAdd = (newBlock) => {
+        if(insertAt !== -1) {
+            sec.blocks.splice(insertAt, 0, newBlock);
+        } else {
+            sec.blocks.push(newBlock);
+        }
+        renderCaseStudy();
+    };
 
     if(type === 'media') {
         const input = document.createElement('input');
@@ -707,22 +717,18 @@ function addSubBlock(pId, sId, type) {
                         const MAX_WIDTH = 1000; const scale = MAX_WIDTH / img.width;
                         canvas.width = MAX_WIDTH; canvas.height = img.height * scale;
                         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                        sec.blocks.push({ type: 'media', src: canvas.toDataURL('image/jpeg', 0.7), fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
-                        renderCaseStudy();
+                        finalizeAdd({ type: 'media', src: canvas.toDataURL('image/jpeg', 0.7), fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
                     };
                     img.src = ev.target.result;
                 } else {
-                    // Non-image as base64 data URL
-                    sec.blocks.push({ type: 'media', src: ev.target.result, fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
-                    renderCaseStudy();
+                    finalizeAdd({ type: 'media', src: ev.target.result, fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
                 }
             };
             reader.readAsDataURL(file);
         };
         input.click();
     } else {
-        sec.blocks.push({ type: type, content: type === 'code' ? "// Paste Code Here" : "Tulis teks baru di sini..." });
-        renderCaseStudy();
+        finalizeAdd({ type: type, content: type === 'code' ? "// Paste Code Here" : "Tulis teks baru di sini..." });
     }
 }
 
