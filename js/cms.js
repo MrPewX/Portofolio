@@ -614,9 +614,9 @@ function renderCaseStudy() {
                 <div class="sub-block-wrapper" style="position:relative">
                     ${isAdmin ? `
                         <div class="sub-block-controls">
-                            <button class="btn-icon" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, -1)" title="Move Up"><i class="fas fa-chevron-up"></i></button>
-                            <button class="btn-icon" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, 1)" title="Move Down"><i class="fas fa-chevron-down"></i></button>
-                            <button class="btn-icon trash" onclick="removeSubBlock(${proj.id}, ${sec.id}, ${bIdx})" title="Delete Block"><i class="fas fa-trash"></i></button>
+                            <button class="btn-icon" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, -1)" title="Geser ke Atas"><i class="fas fa-chevron-up"></i></button>
+                            <button class="btn-icon" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, 1)" title="Geser ke Bawah"><i class="fas fa-chevron-down"></i></button>
+                            <button class="btn-icon trash" onclick="removeSubBlock(${proj.id}, ${sec.id}, ${bIdx})" title="Hapus Blok"><i class="fas fa-trash"></i></button>
                         </div>
                     ` : ''}
                     ${blockDisplay}
@@ -625,15 +625,17 @@ function renderCaseStudy() {
         }).join('');
 
         return `
-            <div class="glass" style="padding: 2rem; margin-bottom: 2rem;" data-section-id="${sec.id}">
+            <div class="glass" style="padding: 2rem; margin-bottom: 2rem; position:relative" data-section-id="${sec.id}">
                 ${isAdmin ? `
+                    <div class="sub-block-controls" style="top:15px; right:15px">
+                        <button class="btn-icon" onclick="moveCaseSection(${proj.id}, ${sec.id}, -1)" title="Geser Poin ke Atas"><i class="fas fa-chevron-up"></i></button>
+                        <button class="btn-icon" onclick="moveCaseSection(${proj.id}, ${sec.id}, 1)" title="Geser Poin ke Bawah"><i class="fas fa-chevron-down"></i></button>
+                        <button class="btn-icon trash" onclick="removeCaseSection(${proj.id}, ${sec.id})" title="Hapus Seluruh Poin"><i class="fas fa-trash"></i></button>
+                    </div>
                     <div class="section-controls mb-3">
-                        <button class="btn-icon" onclick="moveCaseSection(${proj.id}, ${sec.id}, -1)" title="Geser ke Atas"><i class="fas fa-arrow-up"></i></button>
-                        <button class="btn-icon" onclick="moveCaseSection(${proj.id}, ${sec.id}, 1)" title="Geser ke Bawah"><i class="fas fa-arrow-down"></i></button>
                         <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'text')">+ Teks</button>
                         <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'code')">+ Kode</button>
                         <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'media')">+ File</button>
-                        <button class="btn-icon trash ml-2" onclick="removeCaseSection(${proj.id}, ${sec.id})"><i class="fas fa-trash"></i></button>
                     </div>
                 ` : ''}
                 <h3><i class="${sec.icon || 'fas fa-check-circle'}" style="color:var(--accent-primary)"></i> <span id="cs-title-${sec.id}" contenteditable="${isAdmin}">${sec.title}</span></h3>
