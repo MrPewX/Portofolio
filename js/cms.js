@@ -102,6 +102,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         localStorage.setItem('portfolio_projects', JSON.stringify(projectsData));
                         saveBtn.innerText = "Menyimpan...";
                         let payloadDrive = { projects: projectsData };
+                        
+                        // Sertakan data admin agar tidak hilang saat simpan ulang
+                        const adminData = localStorage.getItem('portfolio_admin');
+                        if(adminData) payloadDrive.admin = JSON.parse(adminData);
+
                         document.querySelectorAll('[data-edit-id]').forEach(el => {
                             const key = el.getAttribute('data-edit-id');
                             payloadDrive[key] = localStorage.getItem('portfolio_' + key);
@@ -134,6 +139,9 @@ async function initContent() {
     // 1. Coba ambil dari Google Drive jika URL sudah diisi
     if(GAS_URL !== "") {
         console.log("Mencoba mengambil data dari Google Drive...");
+        const fetchBtn = document.getElementById('save-case-study-btn');
+        if(fetchBtn) fetchBtn.disabled = true;
+
         try {
             // Bypass cache dengan menambahkan parameter timestamp
             const res = await fetch(GAS_URL + "?t=" + new Date().getTime(), {

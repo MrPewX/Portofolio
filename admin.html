@@ -44,18 +44,43 @@
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxnvSMGVq0VqEKg9mF2ZBnBY5AZawADTAtekMbT0OTofrJVvddCcy-8FJXrD6Oe4bAjWQ/exec';
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
+            const uInput = document.getElementById('username').value;
+            const pInput = document.getElementById('password').value;
+            const btn = e.target.querySelector('button');
+            const errorMsg = document.getElementById('error-msg');
             
-            // Hardcoded credentials form user
-            if(u === 'seva' && p === 'seva.123') {
-                localStorage.setItem('isAdmin', 'true');
-                window.location.href = 'index.html';
-            } else {
-                document.getElementById('error-msg').style.display = 'block';
+            btn.innerText = "Memverifikasi...";
+            btn.disabled = true;
+            errorMsg.style.display = 'none';
+
+            try {
+                const resp = await fetch(GAS_URL + "?t=" + Date.now());
+                const data = await resp.json();
+                
+                // Cari data admin di Drive, jika tidak ada pakai default seva/seva.123
+                const admin = data.admin || { u: 'seva', p: 'seva.123' };
+
+                if(uInput === admin.u && pInput === admin.p) {
+                    localStorage.setItem('isAdmin', 'true');
+                    window.location.href = 'index.html';
+                } else {
+                    errorMsg.style.display = 'block';
+                }
+            } catch(err) {
+                // Fallback jika offline
+                if(uInput === 'seva' && pInput === 'seva.123') {
+                    localStorage.setItem('isAdmin', 'true');
+                    window.location.href = 'index.html';
+                } else {
+                    errorMsg.style.display = 'block';
+                }
             }
+            btn.innerText = "Login to CMS";
+            btn.disabled = false;
         });
     </script>
 </body>
