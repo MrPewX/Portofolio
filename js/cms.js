@@ -177,6 +177,73 @@ function enableEditMode() {
         }
     });
 
+    // Fitur: Tambah Penanda Hapus Skill & Testimoni (Klik Ganda)
+    const setDeletable = (selector) => {
+        document.querySelectorAll(selector).forEach(el => {
+            el.title = "Klik Ganda (Double Click) di sini untuk Menghapus item";
+            el.style.cursor = "pointer";
+            el.ondblclick = function(e) {
+                e.stopPropagation(); // Mencegah klik menembus
+                if(confirm('Yakin ingin menghapus item ini permanen?')) {
+                    this.remove();
+                }
+            };
+        });
+    };
+    setDeletable('.skill-item');
+    setDeletable('.testimonial');
+
+    // Fitur: Tombol Tambah Skill Baru
+    const skillsCont = document.querySelector('.skills-container');
+    if(skillsCont) {
+        const btnSk = document.createElement('button');
+        btnSk.className = "btn btn-secondary btn-sm border-dashed mt-3 mb-3 w-100";
+        btnSk.innerHTML = "+ Tambah Keahlian Baru";
+        btnSk.onclick = () => {
+            const skill = prompt("Nama keahlian baru (Contoh: Node.JS):", "Skill Baru");
+            if(!skill) return;
+            const icon = prompt("Ketik Icon FontAwesome (kosongkan jika tidak hafal):", "fas fa-star") || "fas fa-star";
+            const div = document.createElement('div');
+            div.className = "skill-item editable-hover";
+            div.innerHTML = `<i class="${icon}"></i> ${skill}`;
+            skillsCont.appendChild(div);
+            setDeletable('.skill-item'); // re-bind events
+        };
+        skillsCont.parentElement.insertBefore(btnSk, skillsCont.nextSibling);
+    }
+
+    // Fitur: Tombol Tambah Testimoni Baru
+    const testiCont = document.querySelector('.testimonial-slider');
+    if(testiCont) {
+        const btnTs = document.createElement('button');
+        btnTs.className = "btn btn-secondary btn-sm border-dashed mt-3 mb-3 w-100";
+        btnTs.style.gridColumn = "1 / -1"; // merentang
+        btnTs.innerHTML = "+ Tambah Testimoni Baru";
+        btnTs.onclick = () => {
+            const nama = prompt("Nama Klien:", "Budi");
+            if(!nama) return;
+            const peran = prompt("Peran/Jabatan Klien:", "Direktur Utama");
+            const div = document.createElement('div');
+            div.className = "testimonial glass editable-hover";
+            div.innerHTML = `
+                <i class="fas fa-quote-left quote-icon"></i>
+                <p class="feedback" contenteditable="true">"Tulis ulasan/testimoni klien Anda di sini..."</p>
+                <div class="client-info">
+                    <div class="client-avatar">
+                        <img src="https://i.pravatar.cc/150?u=${new Date().getTime()}" alt="${nama}">
+                    </div>
+                    <div>
+                        <h4 contenteditable="true">${nama}</h4>
+                        <span contenteditable="true">${peran || ''}</span>
+                    </div>
+                </div>
+            `;
+            testiCont.appendChild(div);
+            setDeletable('.testimonial'); // re-bind events
+        };
+        testiCont.parentElement.insertBefore(btnTs, testiCont.nextSibling);
+    }
+
     // Logout
     document.getElementById('logout-btn').addEventListener('click', () => {
         localStorage.removeItem('isAdmin');
