@@ -4,7 +4,7 @@
 // KONFIGURASI GOOGLE DRIVE DATABASE
 // ==========================================
 // Nanti isi variabel ini dengan URL Web App dari Google Apps Script
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz12u8BN8qG6zGdHn5svF-IMrjameMylgda86Apx45xiM7Ld-F_w87S3CB307L4fH-F3w/exec"; 
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxnvSMGVq0VqEKg9mF2ZBnBY5AZawADTAtekMbT0OTofrJVvddCcy-8FJXrD6Oe4bAjWQ/exec"; 
 
 // ==========================================
 
@@ -177,13 +177,24 @@ function enableEditMode() {
         renderProjects();
     });
 
-    // Profile Image Upload
+    // Profile Image Upload (With Compression to avoid Drive/Payload limits)
     document.getElementById('profile-upload').addEventListener('change', e => {
         const file = e.target.files[0];
         if(!file) return;
         const reader = new FileReader();
         reader.onload = function(event) {
-            document.getElementById('profile-img').src = event.target.result;
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 500;
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                document.getElementById('profile-img').src = canvas.toDataURL('image/jpeg', 0.8);
+            };
+            img.src = event.target.result;
         };
         reader.readAsDataURL(file);
     });
@@ -285,10 +296,22 @@ function changeProjectImage(id) {
         if(!file) return;
         const reader = new FileReader();
         reader.onload = event => {
-            const base64 = event.target.result;
-            document.getElementById(`proj-img-${id}`).src = base64;
-            const projDef = projectsData.find(p => p.id === id);
-            if(projDef) projDef.img = base64;
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 500;
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                const base64 = canvas.toDataURL('image/jpeg', 0.8);
+                document.getElementById(`proj-img-${id}`).src = base64;
+                const projDef = projectsData.find(p => p.id === id);
+                if(projDef) projDef.img = base64;
+            };
+            img.src = event.target.result;
         };
         reader.readAsDataURL(file);
     };
