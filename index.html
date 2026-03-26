@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seva Anggry Pradana | UI/UX & Web Developer</title>
+    <meta name="description" content="Portofolio Seva Anggry Pradana, Mahasiswa Sistem Informasi UINSA.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS CSS for Scroll Animations -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <!-- Header / Navbar -->
+    <header id="header">
+        <nav class="navbar container">
+            <a href="#" class="logo" data-edit-id="logo-text">Seva<span>.</span></a>
+            <ul class="nav-links">
+                <li><a href="#hero" class="active">Beranda</a></li>
+                <li><a href="#projects">Karya</a></li>
+                <li><a href="#about">Tentang</a></li>
+                <li><a href="#contact">Kontak</a></li>
+            </ul>
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section-spacing relative">
+        <div class="container hero-content">
+            <div class="hero-text" data-aos="fade-right" data-aos-duration="1000">
+                <h3 class="greeting" data-edit-id="hero-greeting">Halo, saya</h3>
+                <h1 class="name" data-edit-id="hero-name">Seva Anggry Pradana</h1>
+                <h2 class="role" data-edit-id="hero-role">UI/UX Designer & Web Developer<span>.</span></h2>
+                <p class="value-prop" data-edit-id="hero-value-prop">Saya membantu merancang dan membangun solusi digital inovatif yang estetis dan berfokus pada pengalaman pengguna yang luar biasa.</p>
+                <div class="hero-cta">
+                    <a href="#projects" class="btn btn-primary">Lihat Karya</a>
+                    <a href="#contact" class="btn btn-secondary">Hubungi Saya</a>
+                </div>
+                <div class="social-hero">
+                    <a href="https://www.instagram.com/svanggryp/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://github.com/MrPewX?tab=repositories" target="_blank"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            <div class="hero-image" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
+                <div class="image-wrapper" id="profile-img-container">
+                    <img src="assets/img/profile-placeholder.jpg" alt="Foto Seva Anggry Pradana" id="profile-img" data-edit-id="profile-img-src">
+                    <div class="floating-badge badge-1">UI/UX</div>
+                    <div class="floating-badge badge-2">Web Dev</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects section-spacing">
+        <div class="container">
+            <div class="section-title text-center" data-aos="fade-up">
+                <h2>Showcase <span>Proyek</span></h2>
+                <p>Bagaimana saya menyelesaikan masalah melalui desain dan kode.</p>
+            </div>
+
+            <!-- Container for Dynamic Projects -->
+            <div class="project-grid" id="project-container">
+                <!-- Projects will be loaded from localStorage via cms.js -->
+            </div>
+            
+            <div id="admin-add-project-container" class="text-center mt-4 hidden">
+                <button id="add-project-btn" class="btn btn-secondary border-dashed"><i class="fas fa-plus"></i> Tambah Proyek Baru</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about section-spacing relative">
+        <div class="container flex-row">
+            <div class="about-text" data-aos="fade-right">
+                <div class="section-title">
+                    <h2>Tentang <span>Saya</span></h2>
+                </div>
+                <div data-edit-id="about-text">
+                    <p>Saya adalah Mahasiswa <strong>S1 Sistem Informasi</strong> di UIN Sunan Ampel Surabaya (UINSA) yang memiliki ketertarikan besar di bidang pengembangan web dan desain antarmuka.</p>
+                    <p>Kelahiran Lamongan, saya percaya bahwa desain yang baik tidak hanya terlihat indah, tetapi harus bisa menyelesaikan masalah pengguna secara efisien. Saya selalu antusias mempelajari teknologi baru untuk menciptakan produk yang berdampak.</p>
+                </div>
+                
+                <h4 class="mt-4">Keahlian & Tools</h4>
+                <div class="skills-container" data-edit-id="skills-container-html">
+                    <div class="skill-item"><i class="fab fa-figma"></i> Figma</div>
+                    <div class="skill-item"><i class="fab fa-react"></i> React</div>
+                    <div class="skill-item"><i class="fab fa-html5"></i> HTML/CSS/JS</div>
+                    <div class="skill-item"><i class="fab fa-php"></i> PHP (CI4/Laravel)</div>
+                    <div class="skill-item"><i class="fas fa-database"></i> MySQL</div>
+                    <div class="skill-item"><i class="fab fa-git-alt"></i> Git</div>
+                </div>
+            </div>
+            <div class="about-stats" data-aos="fade-left">
+                <div class="stat-card glass box-1">
+                    <h3 data-edit-id="stat-1-val">2025</h3>
+                    <p data-edit-id="stat-1-text">Tahun Kurikulum / Periode Masuk</p>
+                </div>
+                <div class="stat-card glass box-2">
+                    <h3 data-edit-id="stat-2-val">10+</h3>
+                    <p data-edit-id="stat-2-text">Proyek Akademik & Personal</p>
+                </div>
+                <div class="stat-card glass box-3">
+                    <h3 data-edit-id="stat-3-val">100%</h3>
+                    <p data-edit-id="stat-3-text">Dedikasi pada Kualitas</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof / Testimonials -->
+    <section class="social-proof section-spacing">
+        <div class="container">
+            <div class="section-title text-center" data-aos="fade-up">
+                <h2>Apa Kata <span>Mereka</span></h2>
+                <p>Kepercayaan dari rekan dan klien adalah motivasi terbesar saya.</p>
+            </div>
+            
+            <div class="testimonial-slider" data-aos="zoom-in" data-aos-delay="200" data-edit-id="testimonials-html">
+                <div class="testimonial glass">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p class="feedback">"Seva memiliki kemampuan analisis yang luar biasa dalam memecahkan masalah sistem. Desain UI yang dikerjakannya selalu rapi dan modern, sangat membantu dalam proyek kolaborasi kami."</p>
+                    <div class="client-info">
+                        <div class="client-avatar">
+                            <img src="https://i.pravatar.cc/150?img=11" alt="Rekan Tim">
+                        </div>
+                        <div>
+                            <h4>Budi Santoso</h4>
+                            <span>Rekan Mahasiswa Sistem Informasi UINSA</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial glass">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p class="feedback">"Proyek aplikasi dashboard berjalan lancar berkat fondasi basis data dan struktur frontend yang kuat dari Seva. Rekomendasi banget untuk kerja sama tim!"</p>
+                    <div class="client-info">
+                        <div class="client-avatar">
+                            <img src="https://i.pravatar.cc/150?img=33" alt="Client">
+                        </div>
+                        <div>
+                            <h4>Siti Aisyah</h4>
+                            <span>Project Manager</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact section-spacing relative">
+        <div class="container flex-row">
+            <div class="contact-info" data-aos="fade-right">
+                <div class="section-title">
+                    <h2>Mari Mulai <span>Kerja Sama</span></h2>
+                    <p>Punya ide luar biasa? Atau butuh bantuan di proyek sistem informasimu? Jangan ragu untuk menghubungi saya!</p>
+                </div>
+                
+                <div class="contact-methods">
+                    <a href="mailto:sevaanggryp@gmail.com" class="contact-method glass">
+                        <div class="icon-box"><i class="fas fa-envelope"></i></div>
+                        <div class="method-text">
+                            <h4>Email</h3>
+                            <p>sevaanggryp@gmail.com</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://github.com/MrPewX?tab=repositories" target="_blank" class="contact-method glass">
+                        <div class="icon-box"><i class="fab fa-github"></i></div>
+                        <div class="method-text">
+                            <h4>GitHub</h3>
+                            <p>MrPewX</p>
+                        </div>
+                    </a>
+
+                    <a href="https://www.instagram.com/svanggryp/" target="_blank" class="contact-method glass">
+                        <div class="icon-box"><i class="fab fa-instagram"></i></div>
+                        <div class="method-text">
+                            <h4>Instagram</h3>
+                            <p>@svanggryp</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="contact-form-container glass" data-aos="fade-left">
+                <!-- Action menggunakan mailto sesuai request -->
+                <form action="mailto:sevaanggryp@gmail.com" method="post" enctype="text/plain" class="contact-form">
+                    <div class="form-group">
+                        <label for="name">Nama Lengkap</label>
+                        <input type="text" id="name" name="Nama_Lengkap" placeholder="Masukkan nama..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Pesan / Purpose</label>
+                        <textarea id="message" name="Pesan" rows="5" placeholder="Tuliskan pesan Anda di sini..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Kirim Ke Email <i class="fas fa-paper-plane ml-2"></i></button>
+                    <p class="text-sm mt-3 text-muted text-center"><i class="fas fa-info-circle"></i> Pesan akan diteruskan melalui aplikasi email Anda langsung ke sevaanggryp@gmail.com</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <!-- Hidden Admin link in footer (click the copyright year) -->
+            <p>&copy; <a href="admin.html" style="color: inherit; text-decoration: none;">2026</a> Seva Anggry Pradana. All rights reserved.</p>
+            <p class="text-sm">Built with <i class="fas fa-heart" style="color:#ff3366"></i> & Vanilla Web Technologies.</p>
+        </div>
+    </footer>
+
+    <!-- Admin Floating Control Panel (Hidden by default) -->
+    <div id="admin-panel" class="hidden glass" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; padding: 15px; border: 1px solid var(--accent-primary);">
+        <p style="margin-bottom: 10px; font-weight: bold; color: var(--accent-primary);"><i class="fas fa-user-shield"></i> Admin Mode</p>
+        <button id="save-changes-btn" class="btn btn-primary btn-sm mb-2 w-100">Simpan Perubahan</button>
+        <button id="logout-btn" class="btn btn-secondary btn-sm w-100">Logout</button>
+        
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1)">
+            <label style="font-size: 0.8rem; margin-bottom: 5px; display: block;">Upload Profil Baru:</label>
+            <input type="file" id="profile-upload" accept="image/*" style="font-size: 0.8rem; width: 100%;">
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/cms.js"></script>
+</body>
+</html>
