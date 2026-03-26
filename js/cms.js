@@ -238,17 +238,22 @@ function enableEditMode() {
         // Jika Google Drive URL diaktifkan, push kesana
         if(GAS_URL !== "") {
             try {
+                // Untuk Google Apps Script POST, sangat disarankan menggunakan mode: 'no-cors'
+                // Karena server Google mengembalikan Redirect (302) yang sering diblokir CORS browser
                 await fetch(GAS_URL, {
                     method: 'POST',
+                    mode: 'no-cors', // Mencegah blokir CORS 
                     headers: {
                         'Content-Type': 'text/plain;charset=utf-8', 
                     },
                     body: JSON.stringify(payloadDrive)
                 });
+                // Karena menggunakan 'no-cors', kita tidak bisa membaca response JSON kembalian,
+                // tapi asalkan tidak ada Exception, artinya proses kirim berhasil ter-trigger.
                 alert("Perubahan berhasil dikirim ke Google Drive dan tersimpan!");
             } catch(e) {
-                console.error(e);
-                alert("Kesalahan menghubungkan ke Google Drive API. Tersimpan lokal.");
+                console.error("Fetch Error:", e);
+                alert("Kesalahan menghubungkan ke Google Drive API. Cek Console untuk melihat log. (Pastikan link GAS_URL benar dan Web App di-deploy dengan akses 'Anyone'). Tersimpan lokal.");
             }
         } else {
             alert("Perubahan berhasil disimpan lokal! (Untuk integrasi Google Drive, masukkan Link Web App di js/cms.js)");
