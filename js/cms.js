@@ -19,10 +19,11 @@ let projectsData = [
         process: "Riset kompetitor ➔ Wireframing ➔ High-fidelity UI ➔ Frontend.",
         linkDemo: "https://demo.com",
         caseStudy: {
-            problem: "Pengguna kesulitan menavigasi produk karena layout yang membingungkan dan alur checkout terlalu panjang.",
-            research: "Berdasarkan wawancara dengan 10+ user, 80% meninggalkan keranjang belanja (cart abandonment) akibat form pembayaran tidak responsif.",
-            tech: "Figma (Prototyping), React.js (Frontend), Tailwind/CSS Vanilla (Styling).",
-            challenges: "Mempertahankan kecepatan loading gambar produk resolusi tinggi tanpa mengurangi kualitas UI."
+            hook: "<strong>Role:</strong> UI/UX Designer & Frontend Developer<br><br><strong>Timeline:</strong> 4 Minggu<br><br><strong>Tools:</strong> Figma, React.js, Tailwind CSS<br><br><strong>Problem:</strong> Pengguna sering meninggalkan keranjang belanja (cart abandonment) akibat alur checkout yang terlalu rumit dan memakan banyak halaman.",
+            research: "<strong>User Persona:</strong> Millennial dan Gen Z yang menginginkan belanja online instan tanpa banyak klik.<br><br><strong>Competitor Analysis:</strong> E-commerce standar biasanya butuh 5 langkah checkout, Miloo Shop dibuat hanya butuh 2 langkah.<br><br><strong>User Flow:</strong> Beranda Produk ➔ Keranjang ➔ Checkout Satu Halaman ➔ Pembayaran Selesai.",
+            design: "<strong>Wireframes:</strong> Sketsa awal berfokus pada kemudahan akses tombol 'Beli' dengan ibu jari pada layar HP.<br><br><strong>Design System:</strong> Palet warna Neon Pastel dipadukan dengan Glassmorphism untuk memberi kesan futuristik namun ramah.<br><br><strong>High-Fidelity:</strong> Tampilan akhir memiliki transisi 60fps yang memuaskan secara visual.",
+            challenge: "<strong>Tantangan:</strong> Sulit mempertahankan state keranjang tetap aktif setelah halaman di-refresh tanpa menggunakan database berat.<br><br><strong>Solusi:</strong> Saya menggunakan kombinasi Context API di React dan sinkronisasi otomatis ke LocalStorage.<br><br><strong>Snippet Kode:</strong><br><pre>useEffect(() => localStorage.setItem('cart', JSON.stringify(cartState)), [cartState]);</pre>",
+            result: "<strong>Fitur Utama:</strong> Checkout 1 Halaman, Kalkulasi Ongkir Otomatis, dan Light/Dark Mode Switcher.<br><br><strong>Apa yang Saya Pelajari:</strong> Dari proyek ini, saya memahami pentingnya optimasi performa *state management* agar interaksi UI tetap mulus."
         }
     },
     {
@@ -34,10 +35,11 @@ let projectsData = [
         process: "Merancang database MySQL ➔ Membangun API ➔ Integrasi interface backend.",
         linkDemo: "https://admin-demo.com",
         caseStudy: {
-            problem: "Sistem absensi dan rekap nilai lama masih manual menggunakan Excel, sehingga rawan error dan lambat.",
-            research: "Kepala sekolah dan guru membutuhkan laporan instan berbasis dashboard grafik harian.",
-            tech: "CodeIgniter 4 (PHP), MySQL Server, Vanilla JavaScript (AOS, Chart.js).",
-            challenges: "Migrasi data lama sebesar 2GB ke dalam struktur database relasional yang baru dan cepat."
+            hook: "<strong>Role:</strong> Full-Stack Web Developer<br><br><strong>Timeline:</strong> 6 Minggu<br><br><strong>Tools:</strong> CodeIgniter 4, MySQL, Bootstrap, JavaScript Vanilla<br><br><strong>Problem:</strong> Sistem absensi dan rekap nilai sekolah masih diinput manual menggunakan Excel, sehingga rawan error dan lambat dibagikan ke orang tua.",
+            research: "<strong>User Persona:</strong> Guru yang sibuk dan Admin staff sekolah bermobilitas tinggi.<br><br><strong>Competitor Analysis:</strong> LMS konvensional terlalu membingungkan bagi guru tua; sistem ini dirancang spesifik hanya menonjolkan fitur paling sering dipakai.<br><br><strong>User Flow:</strong> Login Guru ➔ Pilih Kelas ➔ Centang Absen ➔ Simpan.",
+            design: "<strong>Wireframes:</strong> Layout berupa sidebar navigasi dengan kontainer dinamis utama.<br><br><strong>Design System:</strong> Desain tabular (*DataTables*) yang solid dan bersih, responsif di resolusi tablet.<br><br><strong>High-Fidelity:</strong> Penerapan tema Mikrotik Style di bagian panel kontrol admin.",
+            challenge: "<strong>Tantangan:</strong> Relasi Tabel MySQL cukup rumit antara Jadwal Kelas, Guru, Murid, dan Pengurus Perpustakaan.<br><br><strong>Solusi:</strong> Menerapkan arsitektur *MVC (Model-View-Controller)* bawaan CI4 secara ketat dengan Database Seeding dan Migration Automation.<br><br><strong>Snippet Kode:</strong><br><pre>$builder->select('siswa.*, nilai.mtk')->join('nilai', 'nilai.id = siswa.id')->get();</pre>",
+            result: "<strong>Fitur Utama:</strong> Export/Import Excel Otomatis, Pencetakan Rapor PDF instan, Pinjam Buku Perpustakaan via Barcode.<br><br><strong>Apa yang Saya Pelajari:</strong> Saya menguasai optimasi *Query JOIN* kompleks MySQL agar loading ribuan data siswa memakan waktu kurang dari 2 detik."
         }
     },
     {
@@ -49,10 +51,11 @@ let projectsData = [
         process: "User persona ➔ User flow re-mapping ➔ Pembuatan Design System.",
         linkDemo: "https://app.com",
         caseStudy: {
-            problem: "Data portofolio saham user terlihat bertumpuk dan tidak terbaca jelas saat menggunakan mode terang (Light Mode).",
-            research: "Melihat heat-map klik user, 90% mengabaikan grafik karena warna yang kontrasnya tidak masuk standar aksesibilitas.",
-            tech: "Desain menggunakan Figma dengan Plugin Accessibility Stark.",
-            challenges: "Membuat sistem Design Token lengkap (Glassmorphism & Neon Dark Mode) yang terstruktur dan scalable."
+            hook: "<strong>Role:</strong> UI/UX Researcher & Designer<br><br><strong>Timeline:</strong> 3 Minggu<br><br><strong>Tools:</strong> Figma, FigJam, Zeplin<br><br><strong>Problem:</strong> Data portofolio saham pengguna lama terlihat bertumpuk dan tidak terbaca jelas sehingga menyebabkan salah eksekusi tombol Jual/Beli.",
+            research: "<strong>User Persona:</strong> Investor ritel pemula usia 18-30 tahun yang membaca grafik di perjalanan.<br><br><strong>Competitor Analysis:</strong> Saya menganalisis 3 aplikasi broker saham Top Indonesia dan mengidentifikasi celah kurangnya hierarki tipografi pada laporan untung/rugi harian.<br><br><strong>User Flow:</strong> Buka Aplikasi ➔ Face ID ➔ Dashboard Portofolio ➔ Analisis Order.",
+            design: "<strong>Wireframes:</strong> Pengurutan prioritas Visual *(Visual Hierarchy)* untuk memperbesar font total aset.<br><br><strong>Design System:</strong> Membentuk Tipografi *San Francisco* dengan rasio ukuran Emas (1.618).<br><br><strong>High-Fidelity:</strong> Implementasi Dark Mode premium dengan gradasi Hijau/Merah solid sebagai indikator profit.",
+            challenge: "<strong>Tantangan:</strong> Memastikan teks grafik tetap sangat tajam tapi tetap memenuhi standar kontras kelayakan web internarional (WCAG AAA).<br><br><strong>Solusi:</strong> Saya menggunakan plugin Stark di Figma untuk memvalidasi *Color Contrast* dari warna biru tua ke setiap font abu-abu.<br><br><strong>Snippet Kode:</strong><br><pre>/* Konsep Styling */\n.text-profit { color: #10B981; font-weight: 700; }</pre>",
+            result: "<strong>Fitur Utama:</strong> Dashboard Holistik yang bersih, Gestur usap (swipe) untuk langsung order Jual/Beli.<br><br><strong>Apa yang Saya Pelajari:</strong> Mendesain bukan sekadar mempercantik ruang, melainkan meminimalisir kesalahan dan mempercepat proses kerja saraf kognitif pengguna."
         }
     }
 ];
@@ -260,7 +263,14 @@ function enableEditMode() {
             tags: ["New"],
             context: "Deskripsi konteks di sini.",
             process: "Langkah-langkah di sini.",
-            link: "#"
+            linkDemo: "#",
+            caseStudy: {
+                hook: "<strong>Role:</strong> [Tulis Peran]<br><br><strong>Timeline:</strong> [Waktu]<br><br><strong>Tools:</strong> [Sebutkan Tools]<br><br><strong>Problem:</strong> [Jelaskan Masalahnya]",
+                research: "<strong>User Persona:</strong> [Siapa target penggunanya]<br><br><strong>Competitor Analysis:</strong> [Kelebihan webmu]<br><br><strong>User Flow:</strong> [Diagram atau Alur]",
+                design: "<strong>Wireframes:</strong> [Penjelasan sketsa]<br><br><strong>Design System:</strong> [Warna, Tipe]<br><br><strong>High-Fidelity:</strong> [Tampilan akhir]",
+                challenge: "<strong>Tantangan:</strong> [Apa kesulitannya]<br><br><strong>Solusi:</strong> [Bagaimana menyelesaikannya]<br><br><strong>Snippet Kode:</strong><br><pre>// [Tulis kode]</pre>",
+                result: "<strong>Fitur Utama:</strong> [Daftar fitur]<br><br><strong>Apa yang Saya Pelajari:</strong> [Kesimpulan]"
+            }
         });
         renderProjects();
     });
@@ -432,10 +442,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if(proj) {
                     proj.title = document.getElementById('cs-title').innerText;
-                    proj.caseStudy.problem = document.getElementById('cs-prob').innerText;
-                    proj.caseStudy.research = document.getElementById('cs-res').innerText;
-                    proj.caseStudy.tech = document.getElementById('cs-tech').innerText;
-                    proj.caseStudy.challenges = document.getElementById('cs-chal').innerText;
+                    proj.caseStudy.hook = document.getElementById('cs-hook').innerHTML;
+                    proj.caseStudy.research = document.getElementById('cs-res').innerHTML;
+                    proj.caseStudy.design = document.getElementById('cs-des').innerHTML;
+                    proj.caseStudy.challenge = document.getElementById('cs-chal').innerHTML;
+                    proj.caseStudy.result = document.getElementById('cs-resl').innerHTML;
                     
                     localStorage.setItem('portfolio_projects', JSON.stringify(projectsData));
                     
@@ -488,7 +499,7 @@ function renderCaseStudy() {
         }
 
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
-        if(!proj.caseStudy) proj.caseStudy = {problem:"", research:"", tech:"", challenges:""};
+        if(!proj.caseStudy) proj.caseStudy = {hook:"", research:"", design:"", challenge:"", result:""};
         
         container.innerHTML = `
             <div data-aos="fade-up">
@@ -497,23 +508,28 @@ function renderCaseStudy() {
                 <div class="tags mb-4">${proj.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
                 
                 <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                    <h3><i class="fas fa-exclamation-triangle" style="color:var(--accent-primary)"></i> Problem Statement</h3>
-                    <p id="cs-prob" class="mt-2" contenteditable="${isAdmin}">${proj.caseStudy.problem || 'Belum ada data'}</p>
+                    <h3><i class="fas fa-bullseye" style="color:var(--accent-primary)"></i> 1. Judul & Ringkasan Eksekutif</h3>
+                    <div id="cs-hook" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.hook || 'Belum ada data'}</div>
                 </div>
 
                 <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                    <h3><i class="fas fa-search" style="color:var(--accent-primary)"></i> User Research</h3>
-                    <p id="cs-res" class="mt-2" contenteditable="${isAdmin}">${proj.caseStudy.research || 'Belum ada data'}</p>
+                    <h3><i class="fas fa-search" style="color:var(--accent-primary)"></i> 2. Analisis & Riset (The "Why")</h3>
+                    <div id="cs-res" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.research || 'Belum ada data'}</div>
                 </div>
 
                 <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                    <h3><i class="fas fa-code" style="color:var(--accent-primary)"></i> Detail Teknis & Tools</h3>
-                    <p id="cs-tech" class="mt-2" contenteditable="${isAdmin}">${proj.caseStudy.tech || 'Belum ada data'}</p>
+                    <h3><i class="fas fa-palette" style="color:var(--accent-primary)"></i> 3. Proses Desain (Visual Journey)</h3>
+                    <div id="cs-des" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.design || 'Belum ada data'}</div>
                 </div>
 
                 <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                    <h3><i class="fas fa-dumbbell" style="color:var(--accent-primary)"></i> Tantangan & Solusi</h3>
-                    <p id="cs-chal" class="mt-2" contenteditable="${isAdmin}">${proj.caseStudy.challenges || 'Belum ada data'}</p>
+                    <h3><i class="fas fa-dumbbell" style="color:var(--accent-primary)"></i> 4. Tantangan Teknis & Solusi</h3>
+                    <div id="cs-chal" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.challenge || 'Belum ada data'}</div>
+                </div>
+                
+                <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
+                    <h3><i class="fas fa-trophy" style="color:var(--accent-primary)"></i> 5. Hasil Akhir & Dampak</h3>
+                    <div id="cs-resl" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.result || 'Belum ada data'}</div>
                 </div>
                 
                 <div class="text-center mt-4">
