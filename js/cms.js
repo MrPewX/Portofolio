@@ -61,11 +61,13 @@ let projectsData = [
 ];
 
 const defaultCaseStudyTemplate = {
-    hook: "<strong>Role:</strong> <br><strong>Timeline:</strong> <br><strong>Tools:</strong> <br><strong>Problem:</strong> ",
-    research: "<strong>User Persona:</strong> <br><strong>Competitor Analysis:</strong> <br><strong>User Flow:</strong> ",
-    design: "<strong>Wireframes:</strong> <br><strong>Design System:</strong> <br><strong>High-Fidelity:</strong> ",
-    challenge: "<strong>Tantangan:</strong> <br><strong>Solusi:</strong> <br><strong>Snippet Kode:</strong><br><pre></pre>",
-    result: "<strong>Fitur Utama:</strong> <br><strong>Apa yang Saya Pelajari:</strong> "
+    sections: [
+        { id: 1, title: "1. Judul & Ringkasan Eksekutif", icon: "fas fa-bullseye", content: "<strong>Role:</strong> <br><strong>Timeline:</strong> <br><strong>Tools:</strong> <br><strong>Problem:</strong> ", type: "text", media: null },
+        { id: 2, title: "2. Analisis & Riset (The \"Why\")", icon: "fas fa-search", content: "<strong>User Persona:</strong> <br><strong>Competitor Analysis:</strong> <br><strong>User Flow:</strong> ", type: "text", media: null },
+        { id: 3, title: "3. Proses Desain (Visual Journey)", icon: "fas fa-palette", content: "<strong>Wireframes:</strong> <br><strong>Design System:</strong> <br><strong>High-Fidelity:</strong> ", type: "text", media: null },
+        { id: 4, title: "4. Tantangan Teknis & Solusi", icon: "fas fa-dumbbell", content: "<strong>Tantangan:</strong> <br><strong>Solusi:</strong> <br><strong>Snippet Kode:</strong><br>", type: "code", media: null },
+        { id: 5, title: "5. Hasil Akhir & Dampak", icon: "fas fa-trophy", content: "<strong>Fitur Utama:</strong> <br><strong>Apa yang Saya Pelajari:</strong> ", type: "text", media: null }
+    ]
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -141,15 +143,24 @@ async function initContent() {
         combinedProjects = localProjects;
     }
 
-    // Terakhir, pastikan semua data punya format case study 5-points
+    // Terakhir, pastikan semua data punya format case study
     combinedProjects.forEach(sp => {
-        if(!sp.caseStudy || !sp.caseStudy.hook) {
-            const defSource = projectsData.find(dp => dp.id === sp.id);
-            if(defSource && defSource.caseStudy) {
-                sp.caseStudy = defSource.caseStudy;
-            } else {
-                sp.caseStudy = JSON.parse(JSON.stringify(defaultCaseStudyTemplate));
-            }
+        if(!sp.caseStudy) {
+             sp.caseStudy = JSON.parse(JSON.stringify(defaultCaseStudyTemplate));
+        }
+
+        // Migration from old Object format to new Array format
+        if (sp.caseStudy && !sp.caseStudy.sections) {
+            const old = sp.caseStudy;
+            sp.caseStudy = {
+                sections: [
+                    { id: 1, title: "1. Judul & Ringkasan Eksekutif", icon: "fas fa-bullseye", content: old.hook || "", type: "text", media: null },
+                    { id: 2, title: "2. Analisis & Riset (The \"Why\")", icon: "fas fa-search", content: old.research || "", type: "text", media: null },
+                    { id: 3, title: "3. Proses Desain (Visual Journey)", icon: "fas fa-palette", content: old.design || "", type: "text", media: null },
+                    { id: 4, title: "4. Tantangan Teknis & Solusi", icon: "fas fa-dumbbell", content: old.challenge || (old.hook ? "" : ""), type: "code", media: null },
+                    { id: 5, title: "5. Hasil Akhir & Dampak", icon: "fas fa-trophy", content: old.result || "", type: "text", media: null }
+                ]
+            };
         }
     });
 
@@ -482,19 +493,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const pId = getQueryId();
                 const proj = projectsData.find(p => p.id === pId);
                 
-                if(proj) {
+                if(proj && proj.caseStudy && proj.caseStudy.sections) {
                     proj.title = document.getElementById('cs-title').innerText;
-                    proj.caseStudy.hook = document.getElementById('cs-hook').innerHTML;
-                    proj.caseStudy.research = document.getElementById('cs-res').innerHTML;
-                    proj.caseStudy.design = document.getElementById('cs-des').innerHTML;
-                    proj.caseStudy.challenge = document.getElementById('cs-chal').innerHTML;
-                    proj.caseStudy.result = document.getElementById('cs-resl').innerHTML;
+                    
+                    proj.caseStudy.sections.forEach(sec => {
+                        const contentEl = document.getElementById(`cs-content-${sec.id}`);
+                        const titleEl = document.getElementById(`cs-title-${sec.id}`);
+                        if(contentEl) sec.content = contentEl.innerHTML;
+                        if(titleEl) sec.title = titleEl.innerText;
+                    });
                     
                     localStorage.setItem('portfolio_projects', JSON.stringify(projectsData));
-                    
                     btn.innerText = "Menyimpan...";
                     
-                    // fetch payload
                     let payloadDrive = { projects: projectsData };
                     document.querySelectorAll('[data-edit-id]').forEach(el => {
                         const key = el.getAttribute('data-edit-id');
@@ -509,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                                 body: JSON.stringify(payloadDrive)
                             });
-                            alert("Case Study Tersimpan ke Google Drive!");
+                            alert("Case Study Tersimpan ke Drive!");
                         } catch(e) {
                             alert("Gagal konek Drive API. Tersimpan lokal.");
                         }
@@ -523,7 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function getQueryId() {
     const params = new URLSearchParams(window.location.search);
-    return parseInt(params.get('id')); // Return ID from param ?id=
+    return parseInt(params.get('id')); 
 }
 
 function renderCaseStudy() {
@@ -538,52 +549,149 @@ function renderCaseStudy() {
         return;
     }
 
-        const isAdmin = localStorage.getItem('isAdmin') === 'true';
-        if(!proj.caseStudy) proj.caseStudy = {hook:"", research:"", design:"", challenge:"", result:""};
-        
-        container.innerHTML = `
-            <div>
-                <img src="${proj.img}" style="width:100%; height:400px; object-fit:cover; border-radius:15px; margin-bottom:2rem; border:1px solid var(--border-glass);">
-                <h1 class="mb-3" id="cs-title" contenteditable="${isAdmin}">${proj.title}</h1>
-                <div class="tags mb-4">${proj.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-                
-                <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                    <h3><i class="fas fa-bullseye" style="color:var(--accent-primary)"></i> 1. Judul & Ringkasan Eksekutif</h3>
-                    <div id="cs-hook" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.hook || 'Belum ada data'}</div>
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+    if(!proj.caseStudy || !proj.caseStudy.sections) {
+        proj.caseStudy = JSON.parse(JSON.stringify(defaultCaseStudyTemplate));
+    }
+    
+    let sectionsHtml = proj.caseStudy.sections.map(sec => {
+        let contentDisplay = '';
+        if (sec.type === 'code') {
+            contentDisplay = `
+                <div class="mac-code-window">
+                    <div class="window-header">
+                        <div class="window-dots">
+                            <div class="dot red"></div>
+                            <div class="dot yellow"></div>
+                            <div class="dot green"></div>
+                        </div>
+                    </div>
+                    <div class="window-content" id="cs-content-${sec.id}" contenteditable="${isAdmin}">${sec.content}</div>
                 </div>
+            `;
+        } else {
+            contentDisplay = `<div id="cs-content-${sec.id}" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${sec.content || 'Belum ada data'}</div>`;
+        }
 
-                <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                    <h3><i class="fas fa-search" style="color:var(--accent-primary)"></i> 2. Analisis & Riset (The "Why")</h3>
-                    <div id="cs-res" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.research || 'Belum ada data'}</div>
+        let mediaHtml = '';
+        if (sec.media) {
+             mediaHtml = `
+                <div class="media-preview-container">
+                    <img src="${sec.media}" onclick="openFullMedia('${sec.media}')" alt="Preview">
+                    ${isAdmin ? `<button class="btn btn-secondary btn-sm" style="position:absolute; top:10px; right:10px" onclick="removeMedia(${proj.id}, ${sec.id})">Hapus Foto</button>` : ''}
                 </div>
+             `;
+        }
 
-                <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                    <h3><i class="fas fa-palette" style="color:var(--accent-primary)"></i> 3. Proses Desain (Visual Journey)</h3>
-                    <div id="cs-des" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.design || 'Belum ada data'}</div>
+        let adminControls = '';
+        if (isAdmin) {
+             adminControls = `
+                <div class="section-controls">
+                    <button class="btn-case-admin" onclick="uploadCaseMedia(${proj.id}, ${sec.id})"><i class="fas fa-image"></i> Uploud File</button>
+                    <button class="btn-case-admin" onclick="toggleCodeFormat(${proj.id}, ${sec.id})"><i class="fas fa-code"></i> ${sec.type === 'code' ? 'Ganti ke Teks' : 'Ganti ke Kode'}</button>
+                    <button class="btn-case-admin" style="border-color:#ff5f56; color:#ff5f56" onclick="removeCaseSection(${proj.id}, ${sec.id})"><i class="fas fa-trash"></i></button>
                 </div>
+             `;
+        }
 
-                <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                    <h3><i class="fas fa-dumbbell" style="color:var(--accent-primary)"></i> 4. Tantangan Teknis & Solusi</h3>
-                    <div id="cs-chal" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.challenge || 'Belum ada data'}</div>
-                </div>
-                
-                <div class="glass" style="padding: 2rem; margin-bottom: 2rem;">
-                    <h3><i class="fas fa-trophy" style="color:var(--accent-primary)"></i> 5. Hasil Akhir & Dampak</h3>
-                    <div id="cs-resl" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${proj.caseStudy.result || 'Belum ada data'}</div>
-                </div>
-                
-                <div class="text-center mt-4">
-                    <a href="${proj.linkDemo || '#'}" target="_blank" class="btn btn-primary btn-lg"><i class="fas fa-external-link-alt mr-2"></i> Kunjungi Demo Final</a>
-                </div>
+        return `
+            <div class="glass" style="padding: 2rem; margin-bottom: 2rem;" data-section-id="${sec.id}">
+                ${adminControls}
+                <h3><i class="${sec.icon || 'fas fa-check-circle'}" style="color:var(--accent-primary)"></i> <span id="cs-title-${sec.id}" contenteditable="${isAdmin}">${sec.title}</span></h3>
+                ${contentDisplay}
+                ${mediaHtml}
             </div>
         `;
-        
-        if(isAdmin) {
-             container.querySelectorAll('[contenteditable="true"]').forEach(el => el.classList.add('editable-hover'));
-        }
-        
-        // Fix AOS animation hidden element issue
-        setTimeout(() => {
-            if(typeof window.AOS !== 'undefined') AOS.refresh();
-        }, 100);
+    }).join('');
+
+    container.innerHTML = `
+        <div>
+            <img src="${proj.img}" style="width:100%; height:400px; object-fit:cover; border-radius:15px; margin-bottom:2rem; border:1px solid var(--border-glass);">
+            <h1 class="mb-3" id="cs-title" contenteditable="${isAdmin}">${proj.title}</h1>
+            <div class="tags mb-4">${proj.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+            <div id="sections-list">${sectionsHtml}</div>
+            ${isAdmin ? `
+                <div class="text-center mb-5">
+                    <button class="btn btn-secondary w-100" style="border:2px dashed var(--accent-primary)" onclick="addCaseSection(${proj.id})">
+                        <i class="fas fa-plus"></i> Tambah Poin Baru
+                    </button>
+                </div>
+            ` : ''}
+            <div class="text-center mt-4">
+                <a href="${proj.linkDemo || '#'}" target="_blank" class="btn btn-primary btn-lg"><i class="fas fa-external-link-alt mr-2"></i> Kunjungi Demo</a>
+            </div>
+        </div>
+    `;
+    
+    if(isAdmin) { container.querySelectorAll('[contenteditable="true"]').forEach(el => el.classList.add('editable-hover')); }
+    setTimeout(() => { if(typeof window.AOS !== 'undefined') AOS.refresh(); }, 100);
+}
+
+function addCaseSection(projId) {
+    const proj = projectsData.find(p => p.id === projId);
+    if(proj) {
+        const nextId = proj.caseStudy.sections.length > 0 ? Math.max(...proj.caseStudy.sections.map(s => s.id)) + 1 : 1;
+        proj.caseStudy.sections.push({ id: nextId, title: "Poin Baru", icon: "fas fa-check-circle", content: "Isi konten...", type: "text", media: null });
+        renderCaseStudy();
+    }
+}
+
+function removeCaseSection(projId, secId) {
+    if(confirm("Hapus poin ini?")) {
+        const proj = projectsData.find(p => p.id === projId);
+        if(proj) { proj.caseStudy.sections = proj.caseStudy.sections.filter(s => s.id !== secId); renderCaseStudy(); }
+    }
+}
+
+function toggleCodeFormat(projId, secId) {
+    const proj = projectsData.find(p => p.id === projId);
+    if(proj) {
+        const sec = proj.caseStudy.sections.find(s => s.id === secId);
+        if(sec) { sec.type = (sec.type === 'code' ? 'text' : 'code'); renderCaseStudy(); }
+    }
+}
+
+function uploadCaseMedia(projId, secId) {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*';
+    input.onchange = e => {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = event => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1000; const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const base64 = canvas.toDataURL('image/jpeg', 0.7);
+                const proj = projectsData.find(p => p.id === projId);
+                if(proj) {
+                    const sec = proj.caseStudy.sections.find(s => s.id === secId);
+                    if(sec) sec.media = base64;
+                    renderCaseStudy();
+                }
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+    input.click();
+}
+
+function removeMedia(projId, secId) {
+    const proj = projectsData.find(p => p.id === projId);
+    if(proj) {
+        const sec = proj.caseStudy.sections.find(s => s.id === secId);
+        if(sec) sec.media = null;
+        renderCaseStudy();
+    }
+}
+
+function openFullMedia(src) {
+    const modal = document.createElement('div');
+    modal.className = "media-modal";
+    modal.onclick = () => modal.remove();
+    modal.innerHTML = `<img src="${src}">`;
+    document.body.appendChild(modal);
 }
