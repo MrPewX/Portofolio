@@ -63,6 +63,9 @@ let projectsData = [
 document.addEventListener('DOMContentLoaded', async () => {
     await initContent();
     renderProjects();
+    if(window.location.pathname.includes('project.html')) {
+        renderCaseStudy();
+    }
 
     const isAdmin = localStorage.getItem('isAdmin') === 'true';
     if(isAdmin) {
@@ -109,14 +112,31 @@ async function initContent() {
     });
 
     // 3. Load projects data
-    let savedProjects = null;
     if (driveData && driveData['projects']) {
-        savedProjects = driveData['projects'];
+        let savedProjects = driveData['projects'];
+        // Sinkronisasi data lama (Legacy) tanpa caseStudy dengan template default 5-points
+        savedProjects.forEach(sp => {
+            if(!sp.caseStudy || !sp.caseStudy.hook) {
+                const def = projectsData.find(dp => dp.id === sp.id);
+                if(def && def.caseStudy) {
+                    sp.caseStudy = def.caseStudy;
+                }
+            }
+        });
         projectsData = savedProjects;
     } else {
         const localProjs = localStorage.getItem('portfolio_projects');
         if(localProjs) {
-            try { projectsData = JSON.parse(localProjs); } 
+            try { 
+                let parsed = JSON.parse(localProjs); 
+                parsed.forEach(sp => {
+                    if(!sp.caseStudy || !sp.caseStudy.hook) {
+                        const def = projectsData.find(dp => dp.id === sp.id);
+                        if(def && def.caseStudy) sp.caseStudy = def.caseStudy;
+                    }
+                });
+                projectsData = parsed;
+            } 
             catch(e) { console.error("Error parsing projects"); }
         }
     }
@@ -431,7 +451,6 @@ function changeDemoLink(id) {
 document.addEventListener('DOMContentLoaded', () => {
     // Only run if on project.html
     if(window.location.pathname.includes('project.html')) {
-        renderCaseStudy();
         if(localStorage.getItem('isAdmin') === 'true') {
             document.getElementById('admin-panel').classList.remove('hidden');
             
@@ -488,21 +507,19 @@ function renderCaseStudy() {
     const container = document.getElementById('case-study-content');
     if(!container) return;
     
-    // Tunggu 500ms agar data Drive termuat (karena fetch initContent() async)
-    setTimeout(() => {
-        const id = getQueryId();
-        const proj = projectsData.find(p => p.id === id);
-        
-        if(!proj) {
-            container.innerHTML = `<h2 class="text-center">Proyek tidak ditemukan.</h2>`;
-            return;
-        }
+    const id = getQueryId();
+    const proj = projectsData.find(p => p.id === id);
+    
+    if(!proj) {
+        container.innerHTML = `<h2 class="text-center">Proyek tidak ditemukan.</h2>`;
+        return;
+    }
 
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
         if(!proj.caseStudy) proj.caseStudy = {hook:"", research:"", design:"", challenge:"", result:""};
         
         container.innerHTML = `
-            <div data-aos="fade-up">
+            <div>
                 <img src="${proj.img}" style="width:100%; height:400px; object-fit:cover; border-radius:15px; margin-bottom:2rem; border:1px solid var(--border-glass);">
                 <h1 class="mb-3" id="cs-title" contenteditable="${isAdmin}">${proj.title}</h1>
                 <div class="tags mb-4">${proj.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
@@ -541,5 +558,9 @@ function renderCaseStudy() {
         if(isAdmin) {
              container.querySelectorAll('[contenteditable="true"]').forEach(el => el.classList.add('editable-hover'));
         }
-    }, 500); 
+        
+        // Fix AOS animation hidden element issue
+        setTimeout(() => {
+            if(typeof window.AOS !== 'undefined') AOS.refresh();
+        }, 100);
 }
