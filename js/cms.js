@@ -301,6 +301,18 @@ function enableEditMode() {
             caseStudy: JSON.parse(JSON.stringify(defaultCaseStudyTemplate))
         });
         renderProjects();
+        
+        // Silent Auto-Save ke Drive & Local Storage agar saat pindah ke halaman Detail, 
+        // ID proyek sudah dikenali (mencegah black screen "Proyek tidak ditemukan")
+        const saveBtn = document.getElementById('save-changes-btn');
+        if(saveBtn) {
+            // Bypass alert sementara agar tidak mengganggu UI experience
+            const originalAlert = window.alert;
+            window.alert = () => {}; 
+            saveBtn.click();
+            // Kembalikan alert setelah 1.5 detik (waktu aman Drive API POST)
+            setTimeout(() => { window.alert = originalAlert; }, 1500);
+        }
     });
 
     // Profile Image Upload (With Compression to avoid Drive/Payload limits)
