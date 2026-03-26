@@ -586,23 +586,31 @@ function renderCaseStudy() {
                 const isImage = ['jpg','jpeg','png','gif','webp','svg'].includes(ext) || (block.src && block.src.startsWith('data:image/'));
                 const isVideo = ['mp4','webm','ogg'].includes(ext) || (block.src && block.src.startsWith('data:video/'));
                 const isPdf = ext === 'pdf' || (block.src && block.src.startsWith('data:application/pdf'));
+                const isProg = ['js','php','css','html','py','java','c','cpp','txt','sql','json','xml'].includes(ext);
 
                 if(isImage) {
-                    blockDisplay = `<div class="media-preview-container"><img src="${block.src}" onclick="openFullMedia('${block.src}')" alt="Media"></div>`;
+                    blockDisplay = `<div class="media-preview-container" style="background:#000"><img src="${block.src}" onclick="openFullMedia('${block.src}')" style="max-height:600px; cursor:zoom-in" alt="Media"></div>`;
                 } else if (isVideo) {
                     blockDisplay = `<div class="media-preview-container"><video src="${block.src}" controls style="width:100%; border-radius:12px; border:1px solid var(--border-glass)"></video></div>`;
                 } else if (isPdf) {
-                    blockDisplay = `<div class="media-preview-container"><iframe src="${block.src}" style="width:100%; height:500px; border-radius:12px; border:none;"></iframe></div>`;
+                    blockDisplay = `<div class="media-preview-container"><iframe src="${block.src}" style="width:100%; height:600px; border-radius:12px; border:none; background:white;"></iframe></div>`;
+                } else if (isProg && block.textContent) {
+                    blockDisplay = `
+                        <div class="mac-code-window" style="margin: 0;">
+                            <div class="window-header"><div class="window-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div><span style="font-size:0.75rem; color:#888; margin-left:12px"><i class="fas fa-code"></i> ${block.fileName}</span></div></div>
+                            <div class="window-content" style="max-height:400px; overflow-y:auto; text-align:left; font-family:'Courier New', Courier, monospace; font-size:0.9rem; white-space:pre-wrap;">${block.textContent.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+                        </div>
+                    `;
                 } else {
                     const icon = getFileIcon(block.fileName || '');
                     blockDisplay = `
                         <div class="file-block">
                             <i class="${icon} file-icon"></i>
                             <div class="file-info text-left">
-                                <span class="file-name">${block.fileName || 'Document'}</span>
+                                <span class="file-name">${block.fileName || 'Dokumen'}</span>
                                 <span class="file-size">${block.size || '?'}</span>
                             </div>
-                            <a href="${block.src}" download="${block.fileName}" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Simpan</a>
+                            <a href="${block.src}" download="${block.fileName}" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Unduh File</a>
                         </div>
                     `;
                 }
@@ -682,10 +690,12 @@ function getFileIcon(filename) {
     const ext = filename.split('.').pop().toLowerCase();
     if(['pdf'].includes(ext)) return 'fas fa-file-pdf';
     if(['doc','docx'].includes(ext)) return 'fas fa-file-word';
-    if(['xls','xlsx'].includes(ext)) return 'fas fa-file-excel';
+    if(['xls','xlsx','csv'].includes(ext)) return 'fas fa-file-excel';
     if(['ppt','pptx'].includes(ext)) return 'fas fa-file-powerpoint';
-    if(['zip','rar','7z'].includes(ext)) return 'fas fa-file-archive';
-    if(['mp4','mov','avi'].includes(ext)) return 'fas fa-file-video';
+    if(['zip','rar','7z','gz','tar'].includes(ext)) return 'fas fa-file-archive';
+    if(['mp4','mov','avi','mkv','webm'].includes(ext)) return 'fas fa-file-video';
+    if(['js','php','css','html','py','java','c','cpp','txt','sql','json','xml','go','rb'].includes(ext)) return 'fas fa-file-code';
+    if(['mp3','wav','ogg'].includes(ext)) return 'fas fa-file-audio';
     return 'fas fa-file-alt';
 }
 
@@ -709,19 +719,28 @@ function addSubBlock(pId, sId, type, insertAt = -1) {
         input.type = 'file';
         input.onchange = e => {
             const file = e.target.files[0]; if(!file) return;
+            const ext = file.name.split('.').pop().toLowerCase();
+            const isImage = file.type.startsWith('image/');
+            const isText = ['js','php','css','html','py','java','c','cpp','txt','sql','json','xml','go','rb'].includes(ext);
+            
             const reader = new FileReader();
             reader.onload = ev => {
-                const isImage = file.type.startsWith('image/');
                 if (isImage) {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 1000; const scale = MAX_WIDTH / img.width;
+                        const MAX_WIDTH = 1200; const scale = MAX_WIDTH / img.width;
                         canvas.width = MAX_WIDTH; canvas.height = img.height * scale;
                         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                        finalizeAdd({ type: 'media', src: canvas.toDataURL('image/jpeg', 0.7), fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
+                        finalizeAdd({ type: 'media', src: canvas.toDataURL('image/jpeg', 0.8), fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
                     };
                     img.src = ev.target.result;
+                } else if (isText) {
+                    const textReader = new FileReader();
+                    textReader.onload = tEv => {
+                        finalizeAdd({ type: 'media', textContent: tEv.target.result, src: ev.target.result, fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
+                    };
+                    textReader.readAsText(file);
                 } else {
                     finalizeAdd({ type: 'media', src: ev.target.result, fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
                 }
