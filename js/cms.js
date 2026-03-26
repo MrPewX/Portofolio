@@ -54,9 +54,14 @@ async function initContent() {
     
     // 1. Coba ambil dari Google Drive jika URL sudah diisi
     if(GAS_URL !== "") {
+        console.log("Mencoba mengambil data dari Google Drive...");
         try {
-            const res = await fetch(GAS_URL);
+            // Bypass cache dengan menambahkan parameter timestamp
+            const res = await fetch(GAS_URL + "?t=" + new Date().getTime(), {
+                cache: 'no-store'
+            });
             driveData = await res.json();
+            console.log("Data berhasil diambil dari Drive:", driveData);
         } catch(e) {
             console.warn("Gagal mengambil data dari Google Drive, fallback ke LocalStorage", e);
         }
