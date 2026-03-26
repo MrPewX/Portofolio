@@ -62,11 +62,11 @@ let projectsData = [
 
 const defaultCaseStudyTemplate = {
     sections: [
-        { id: 1, title: "1. Judul & Ringkasan Eksekutif", icon: "fas fa-bullseye", content: "<strong>Role:</strong> <br><strong>Timeline:</strong> <br><strong>Tools:</strong> <br><strong>Problem:</strong> ", type: "text", media: null },
-        { id: 2, title: "2. Analisis & Riset (The \"Why\")", icon: "fas fa-search", content: "<strong>User Persona:</strong> <br><strong>Competitor Analysis:</strong> <br><strong>User Flow:</strong> ", type: "text", media: null },
-        { id: 3, title: "3. Proses Desain (Visual Journey)", icon: "fas fa-palette", content: "<strong>Wireframes:</strong> <br><strong>Design System:</strong> <br><strong>High-Fidelity:</strong> ", type: "text", media: null },
-        { id: 4, title: "4. Tantangan Teknis & Solusi", icon: "fas fa-dumbbell", content: "<strong>Tantangan:</strong> <br><strong>Solusi:</strong> <br><strong>Snippet Kode:</strong><br>", type: "code", media: null },
-        { id: 5, title: "5. Hasil Akhir & Dampak", icon: "fas fa-trophy", content: "<strong>Fitur Utama:</strong> <br><strong>Apa yang Saya Pelajari:</strong> ", type: "text", media: null }
+        { id: 1, title: "1. Judul & Ringkasan Eksekutif", icon: "fas fa-bullseye", blocks: [{ type: "text", content: "<strong>Role:</strong> <br><strong>Timeline:</strong> <br><strong>Tools:</strong> <br><strong>Problem:</strong> " }] },
+        { id: 2, title: "2. Analisis & Riset (The \"Why\")", icon: "fas fa-search", blocks: [{ type: "text", content: "<strong>User Persona:</strong> <br><strong>Competitor Analysis:</strong> <br><strong>User Flow:</strong> " }] },
+        { id: 3, title: "3. Proses Desain (Visual Journey)", icon: "fas fa-palette", blocks: [{ type: "text", content: "<strong>Wireframes:</strong> <br><strong>Design System:</strong> <br><strong>High-Fidelity:</strong> " }] },
+        { id: 4, title: "4. Tantangan Teknis & Solusi", icon: "fas fa-dumbbell", blocks: [{ type: "code", content: "// Code Snippet here..." }] },
+        { id: 5, title: "5. Hasil Akhir & Dampak", icon: "fas fa-trophy", blocks: [{ type: "text", content: "<strong>Fitur Utama:</strong> <br><strong>Apa yang Saya Pelajari:</strong> " }] }
     ]
 };
 
@@ -90,10 +90,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if(proj && proj.caseStudy && proj.caseStudy.sections) {
                         proj.title = document.getElementById('cs-title').innerText;
                         proj.caseStudy.sections.forEach(sec => {
-                            const contentEl = document.getElementById(`cs-content-${sec.id}`);
                             const titleEl = document.getElementById(`cs-title-${sec.id}`);
-                            if(contentEl) sec.content = contentEl.innerHTML;
                             if(titleEl) sec.title = titleEl.innerText;
+                            sec.blocks.forEach((block, bIdx) => {
+                                 const blockEl = document.getElementById(`block-${sec.id}-${bIdx}`);
+                                 if(blockEl && (block.type === 'text' || block.type === 'code')) {
+                                     block.content = blockEl.innerHTML;
+                                 }
+                            });
                         });
                         localStorage.setItem('portfolio_projects', JSON.stringify(projectsData));
                         saveBtn.innerText = "Menyimpan...";
@@ -195,13 +199,24 @@ async function initContent() {
             const old = sp.caseStudy;
             sp.caseStudy = {
                 sections: [
-                    { id: 1, title: "1. Judul & Ringkasan Eksekutif", icon: "fas fa-bullseye", content: old.hook || "", type: "text", media: null },
-                    { id: 2, title: "2. Analisis & Riset (The \"Why\")", icon: "fas fa-search", content: old.research || "", type: "text", media: null },
-                    { id: 3, title: "3. Proses Desain (Visual Journey)", icon: "fas fa-palette", content: old.design || "", type: "text", media: null },
-                    { id: 4, title: "4. Tantangan Teknis & Solusi", icon: "fas fa-dumbbell", content: old.challenge || (old.hook ? "" : ""), type: "code", media: null },
-                    { id: 5, title: "5. Hasil Akhir & Dampak", icon: "fas fa-trophy", content: old.result || "", type: "text", media: null }
+                    { id: 1, title: "1. Judul & Ringkasan Eksekutif", icon: "fas fa-bullseye", blocks: [{ type: "text", content: old.hook || "" }] },
+                    { id: 2, title: "2. Analisis & Riset (The \"Why\")", icon: "fas fa-search", blocks: [{ type: "text", content: old.research || "" }] },
+                    { id: 3, title: "3. Proses Desain (Visual Journey)", icon: "fas fa-palette", blocks: [{ type: "text", content: old.design || "" }] },
+                    { id: 4, title: "4. Tantangan Teknis & Solusi", icon: "fas fa-dumbbell", blocks: [{ type: "code", content: old.challenge || "" }] },
+                    { id: 5, title: "5. Hasil Akhir & Dampak", icon: "fas fa-trophy", blocks: [{ type: "text", content: old.result || "" }] }
                 ]
             };
+        }
+
+        // Migration to Blocks format if using old array-only logic
+        if (sp.caseStudy && sp.caseStudy.sections && !sp.caseStudy.sections[0].blocks) {
+             sp.caseStudy.sections.forEach(sec => {
+                 sec.blocks = [];
+                 if(sec.content) sec.blocks.push({ type: 'text', content: sec.content });
+                 if(sec.media) sec.blocks.push({ type: 'media', src: sec.media, fileName: 'File Upload', size: '?' });
+                 if(sec.type === 'code') sec.blocks[0].type = 'code';
+                 delete sec.content; delete sec.media; delete sec.type;
+             });
         }
     });
 
@@ -537,63 +552,80 @@ function renderCaseStudy() {
     
     const id = getQueryId();
     const proj = projectsData.find(p => p.id === id);
-    
-    if(!proj) {
-        container.innerHTML = `<h2 class="text-center">Proyek tidak ditemukan.</h2>`;
-        return;
-    }
+    if(!proj) { container.innerHTML = `<h2 class="text-center">Proyek tidak ditemukan.</h2>`; return; }
 
     const isAdmin = localStorage.getItem('isAdmin') === 'true';
     if(!proj.caseStudy || !proj.caseStudy.sections) {
         proj.caseStudy = JSON.parse(JSON.stringify(defaultCaseStudyTemplate));
     }
     
+    // Render Tags with Management
+    let tagHtml = proj.tags.map(t => `
+        <span class="tag">
+            ${t}
+            ${isAdmin ? `<i class="fas fa-times btn-tag-remove" onclick="removeProjectTag(${proj.id}, '${t}')"></i>` : ''}
+        </span>
+    `).join('');
+    
+    if(isAdmin) { tagHtml += `<button class="add-tag-btn" onclick="addProjectTag(${proj.id})">+ Label</button>`; }
+
     let sectionsHtml = proj.caseStudy.sections.map(sec => {
-        let contentDisplay = '';
-        if (sec.type === 'code') {
-            contentDisplay = `
-                <div class="mac-code-window">
-                    <div class="window-header">
-                        <div class="window-dots">
-                            <div class="dot red"></div>
-                            <div class="dot yellow"></div>
-                            <div class="dot green"></div>
-                        </div>
+        let blocksHtml = sec.blocks.map((block, bIdx) => {
+            let blockDisplay = '';
+            let blockId = `block-${sec.id}-${bIdx}`;
+            
+            if (block.type === 'code') {
+                blockDisplay = `
+                    <div class="mac-code-window">
+                        <div class="window-header"><div class="window-dots"><div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div></div></div>
+                        <div class="window-content" id="${blockId}" contenteditable="${isAdmin}">${block.content}</div>
                     </div>
-                    <div class="window-content" id="cs-content-${sec.id}" contenteditable="${isAdmin}">${sec.content}</div>
+                `;
+            } else if (block.type === 'media') {
+                const isImage = block.src && block.src.startsWith('data:image/');
+                if(isImage) {
+                    blockDisplay = `<div class="media-preview-container"><img src="${block.src}" onclick="openFullMedia('${block.src}')" alt="Media"></div>`;
+                } else {
+                    const icon = getFileIcon(block.fileName || '');
+                    blockDisplay = `
+                        <div class="file-block">
+                            <i class="${icon} file-icon"></i>
+                            <div class="file-info text-left">
+                                <span class="file-name">${block.fileName || 'Document'}</span>
+                                <span class="file-size">${block.size || '?'}</span>
+                            </div>
+                            <a href="${block.src}" download="${block.fileName}" class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Simpan</a>
+                        </div>
+                    `;
+                }
+            } else {
+                blockDisplay = `<div id="${blockId}" class="sub-block text-edit-block" contenteditable="${isAdmin}">${block.content || '...'}</div>`;
+            }
+
+            return `
+                <div class="sub-block-wrapper" style="position:relative">
+                    ${isAdmin ? `
+                        <div class="sub-block-controls" style="position:absolute; top:-10px; right:0; z-index:10; display:flex; gap:5px;">
+                            <button class="btn btn-secondary btn-sm" onclick="removeSubBlock(${proj.id}, ${sec.id}, ${bIdx})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    ` : ''}
+                    ${blockDisplay}
                 </div>
             `;
-        } else {
-            contentDisplay = `<div id="cs-content-${sec.id}" class="mt-3 text-edit-block" contenteditable="${isAdmin}">${sec.content || 'Belum ada data'}</div>`;
-        }
-
-        let mediaHtml = '';
-        if (sec.media) {
-             mediaHtml = `
-                <div class="media-preview-container">
-                    <img src="${sec.media}" onclick="openFullMedia('${sec.media}')" alt="Preview">
-                    ${isAdmin ? `<button class="btn btn-secondary btn-sm" style="position:absolute; top:10px; right:10px" onclick="removeMedia(${proj.id}, ${sec.id})">Hapus Foto</button>` : ''}
-                </div>
-             `;
-        }
-
-        let adminControls = '';
-        if (isAdmin) {
-             adminControls = `
-                <div class="section-controls">
-                    <button class="btn-case-admin" onclick="uploadCaseMedia(${proj.id}, ${sec.id})"><i class="fas fa-image"></i> Uploud File</button>
-                    <button class="btn-case-admin" onclick="toggleCodeFormat(${proj.id}, ${sec.id})"><i class="fas fa-code"></i> ${sec.type === 'code' ? 'Ganti ke Teks' : 'Ganti ke Kode'}</button>
-                    <button class="btn-case-admin" style="border-color:#ff5f56; color:#ff5f56" onclick="removeCaseSection(${proj.id}, ${sec.id})"><i class="fas fa-trash"></i></button>
-                </div>
-             `;
-        }
+        }).join('');
 
         return `
             <div class="glass" style="padding: 2rem; margin-bottom: 2rem;" data-section-id="${sec.id}">
-                ${adminControls}
+                ${isAdmin ? `
+                    <div class="section-controls mb-3">
+                        <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'text')">+ Teks</button>
+                        <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'code')">+ Kode MacOS</button>
+                        <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'media')">+ Uploud File</button>
+                        <button class="btn btn-secondary btn-sm" style="color:#ff5f56" onclick="removeCaseSection(${proj.id}, ${sec.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                ` : ''}
                 <h3><i class="${sec.icon || 'fas fa-check-circle'}" style="color:var(--accent-primary)"></i> <span id="cs-title-${sec.id}" contenteditable="${isAdmin}">${sec.title}</span></h3>
-                ${contentDisplay}
-                ${mediaHtml}
+                <div class="blocks-container">${blocksHtml}</div>
             </div>
         `;
     }).join('');
@@ -602,18 +634,12 @@ function renderCaseStudy() {
         <div>
             <img src="${proj.img}" style="width:100%; height:400px; object-fit:cover; border-radius:15px; margin-bottom:2rem; border:1px solid var(--border-glass);">
             <h1 class="mb-3" id="cs-title" contenteditable="${isAdmin}">${proj.title}</h1>
-            <div class="tags mb-4">${proj.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+            <div class="tags mb-4">${tagHtml}</div>
             <div id="sections-list">${sectionsHtml}</div>
             ${isAdmin ? `
-                <div class="text-center mb-5">
-                    <button class="btn btn-secondary w-100" style="border:2px dashed var(--accent-primary)" onclick="addCaseSection(${proj.id})">
-                        <i class="fas fa-plus"></i> Tambah Poin Baru
-                    </button>
-                </div>
+                <div class="text-center mb-5"><button class="btn btn-secondary w-100" style="border:2px dashed var(--accent-primary)" onclick="addCaseSection(${proj.id})">+ Tambah Poin Baru</button></div>
             ` : ''}
-            <div class="text-center mt-4">
-                <a href="${proj.linkDemo || '#'}" target="_blank" class="btn btn-primary btn-lg"><i class="fas fa-external-link-alt mr-2"></i> Kunjungi Demo</a>
-            </div>
+            <div class="text-center mt-4"><a href="${proj.linkDemo || '#'}" target="_blank" class="btn btn-primary btn-lg"><i class="fas fa-external-link-alt"></i> Kunjungi Demo</a></div>
         </div>
     `;
     
@@ -621,71 +647,102 @@ function renderCaseStudy() {
     setTimeout(() => { if(typeof window.AOS !== 'undefined') AOS.refresh(); }, 100);
 }
 
+// ============== TAG MANAGEMENT ==============
+function addProjectTag(id) {
+    const proj = projectsData.find(p => p.id === id);
+    const newTag = prompt("Nama Label Baru (Contoh: REACT):");
+    if(newTag && proj) {
+        proj.tags.push(newTag.toUpperCase());
+        renderCaseStudy();
+    }
+}
+function removeProjectTag(id, tag) {
+    const proj = projectsData.find(p => p.id === id);
+    if(proj) {
+        proj.tags = proj.tags.filter(t => t !== tag);
+        renderCaseStudy();
+    }
+}
+
+function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    if(['pdf'].includes(ext)) return 'fas fa-file-pdf';
+    if(['doc','docx'].includes(ext)) return 'fas fa-file-word';
+    if(['xls','xlsx'].includes(ext)) return 'fas fa-file-excel';
+    if(['ppt','pptx'].includes(ext)) return 'fas fa-file-powerpoint';
+    if(['zip','rar','7z'].includes(ext)) return 'fas fa-file-archive';
+    if(['mp4','mov','avi'].includes(ext)) return 'fas fa-file-video';
+    return 'fas fa-file-alt';
+}
+
+// ============== SUB-BLOCK ACTIONS ==============
+function addSubBlock(pId, sId, type) {
+    const proj = projectsData.find(p => p.id === pId);
+    const sec = proj?.caseStudy?.sections?.find(s => s.id === sId);
+    if(!sec) return;
+
+    if(type === 'media') {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.onchange = e => {
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const isImage = file.type.startsWith('image/');
+                if (isImage) {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 1000; const scale = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH; canvas.height = img.height * scale;
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        sec.blocks.push({ type: 'media', src: canvas.toDataURL('image/jpeg', 0.7), fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
+                        renderCaseStudy();
+                    };
+                    img.src = ev.target.result;
+                } else {
+                    // Non-image as base64 data URL
+                    sec.blocks.push({ type: 'media', src: ev.target.result, fileName: file.name, size: (file.size/1024).toFixed(1)+' KB' });
+                    renderCaseStudy();
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+        input.click();
+    } else {
+        sec.blocks.push({ type: type, content: type === 'code' ? "// Paste Code Here" : "Tulis teks baru di sini..." });
+        renderCaseStudy();
+    }
+}
+
+function removeSubBlock(pId, sId, bIdx) {
+    const proj = projectsData.find(p => p.id === pId);
+    const sec = proj.caseStudy.sections.find(s => s.id === sId);
+    if(sec && confirm("Hapus blok ini?")) {
+        sec.blocks.splice(bIdx, 1);
+        renderCaseStudy();
+    }
+}
+
 function addCaseSection(projId) {
     const proj = projectsData.find(p => p.id === projId);
     if(proj) {
         const nextId = proj.caseStudy.sections.length > 0 ? Math.max(...proj.caseStudy.sections.map(s => s.id)) + 1 : 1;
-        proj.caseStudy.sections.push({ id: nextId, title: "Poin Baru", icon: "fas fa-check-circle", content: "Isi konten...", type: "text", media: null });
+        proj.caseStudy.sections.push({ id: nextId, title: "Poin Baru", icon: "fas fa-check-circle", blocks: [{type:'text', content:'Isi baru...'}] });
         renderCaseStudy();
     }
 }
 
 function removeCaseSection(projId, secId) {
-    if(confirm("Hapus poin ini?")) {
+    if(confirm("Hapus seluruh poin ini?")) {
         const proj = projectsData.find(p => p.id === projId);
         if(proj) { proj.caseStudy.sections = proj.caseStudy.sections.filter(s => s.id !== secId); renderCaseStudy(); }
     }
 }
 
-function toggleCodeFormat(projId, secId) {
-    const proj = projectsData.find(p => p.id === projId);
-    if(proj) {
-        const sec = proj.caseStudy.sections.find(s => s.id === secId);
-        if(sec) { sec.type = (sec.type === 'code' ? 'text' : 'code'); renderCaseStudy(); }
-    }
-}
-
-function uploadCaseMedia(projId, secId) {
-    const input = document.createElement('input');
-    input.type = 'file'; input.accept = 'image/*';
-    input.onchange = e => {
-        const file = e.target.files[0]; if(!file) return;
-        const reader = new FileReader();
-        reader.onload = event => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 1000; const scaleSize = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
-                const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                const base64 = canvas.toDataURL('image/jpeg', 0.7);
-                const proj = projectsData.find(p => p.id === projId);
-                if(proj) {
-                    const sec = proj.caseStudy.sections.find(s => s.id === secId);
-                    if(sec) sec.media = base64;
-                    renderCaseStudy();
-                }
-            };
-            img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    };
-    input.click();
-}
-
-function removeMedia(projId, secId) {
-    const proj = projectsData.find(p => p.id === projId);
-    if(proj) {
-        const sec = proj.caseStudy.sections.find(s => s.id === secId);
-        if(sec) sec.media = null;
-        renderCaseStudy();
-    }
-}
-
 function openFullMedia(src) {
-    const modal = document.createElement('div');
-    modal.className = "media-modal";
-    modal.onclick = () => modal.remove();
-    modal.innerHTML = `<img src="${src}">`;
-    document.body.appendChild(modal);
+    const m = document.createElement('div');
+    m.className = "media-modal"; m.onclick = () => m.remove();
+    m.innerHTML = `<img src="${src}">`;
+    document.body.appendChild(m);
 }

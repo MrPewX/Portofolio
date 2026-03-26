@@ -996,4 +996,14 @@ header.scrolled {
 }
 
 .text-edit-block { min-height: 50px; }
+.sub-block-wrapper { position: relative; border-radius: 12px; transition: 0.2s; }
+.sub-block-wrapper:hover { background: rgba(255,255,255,0.05); }
+.sub-block-controls { display: none; position: absolute; top: -10px; right: 10px; z-index: 10; gap: 5px; }
+.sub-block-wrapper:hover .sub-block-controls { display: flex; }
+.btn-tag-remove { margin-left: 8px; cursor: pointer; color: #ff5f56; }
+.add-tag-btn { border: 1px dashed var(--accent-primary); background: transparent; color: var(--accent-primary); border-radius: 20px; padding: 2px 10px; font-size: 0.75rem; cursor: pointer; }
+.file-block { display: flex; align-items: center; gap: 15px; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid var(--border-glass); }
+.file-icon { font-size: 2rem; color: var(--accent-primary); }
+.file-name { font-weight: 600; flex: 1; }
+
 
