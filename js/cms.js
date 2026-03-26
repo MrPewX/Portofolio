@@ -582,9 +582,17 @@ function renderCaseStudy() {
                     </div>
                 `;
             } else if (block.type === 'media') {
-                const isImage = block.src && block.src.startsWith('data:image/');
+                const ext = (block.fileName || '').split('.').pop().toLowerCase();
+                const isImage = ['jpg','jpeg','png','gif','webp','svg'].includes(ext) || (block.src && block.src.startsWith('data:image/'));
+                const isVideo = ['mp4','webm','ogg'].includes(ext) || (block.src && block.src.startsWith('data:video/'));
+                const isPdf = ext === 'pdf' || (block.src && block.src.startsWith('data:application/pdf'));
+
                 if(isImage) {
                     blockDisplay = `<div class="media-preview-container"><img src="${block.src}" onclick="openFullMedia('${block.src}')" alt="Media"></div>`;
+                } else if (isVideo) {
+                    blockDisplay = `<div class="media-preview-container"><video src="${block.src}" controls style="width:100%; border-radius:12px; border:1px solid var(--border-glass)"></video></div>`;
+                } else if (isPdf) {
+                    blockDisplay = `<div class="media-preview-container"><iframe src="${block.src}" style="width:100%; height:500px; border-radius:12px; border:none;"></iframe></div>`;
                 } else {
                     const icon = getFileIcon(block.fileName || '');
                     blockDisplay = `
@@ -603,12 +611,13 @@ function renderCaseStudy() {
             }
 
             return `
-                <div class="sub-block-wrapper" style="position:relative">
-                    ${isAdmin ? `
-                        <div class="sub-block-controls" style="position:absolute; top:-10px; right:0; z-index:10; display:flex; gap:5px;">
-                            <button class="btn btn-secondary btn-sm" onclick="removeSubBlock(${proj.id}, ${sec.id}, ${bIdx})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    ` : ''}
+                ${isAdmin ? `
+                    <div class="sub-block-controls" style="position:absolute; top:-10px; right:0; z-index:10; display:flex; gap:5px;">
+                        <button class="btn btn-secondary btn-sm" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, -1)"><i class="fas fa-chevron-up"></i></button>
+                        <button class="btn btn-secondary btn-sm" onclick="moveSubBlock(${proj.id}, ${sec.id}, ${bIdx}, 1)"><i class="fas fa-chevron-down"></i></button>
+                        <button class="btn btn-secondary btn-sm" onclick="removeSubBlock(${proj.id}, ${sec.id}, ${bIdx})"><i class="fas fa-trash"></i></button>
+                    </div>
+                ` : ''}
                     ${blockDisplay}
                 </div>
             `;
@@ -618,9 +627,11 @@ function renderCaseStudy() {
             <div class="glass" style="padding: 2rem; margin-bottom: 2rem;" data-section-id="${sec.id}">
                 ${isAdmin ? `
                     <div class="section-controls mb-3">
+                        <button class="btn btn-secondary btn-sm" onclick="moveCaseSection(${proj.id}, ${sec.id}, -1)"><i class="fas fa-arrow-up"></i></button>
+                        <button class="btn btn-secondary btn-sm" onclick="moveCaseSection(${proj.id}, ${sec.id}, 1)"><i class="fas fa-arrow-down"></i></button>
                         <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'text')">+ Teks</button>
-                        <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'code')">+ Kode MacOS</button>
-                        <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'media')">+ Uploud File</button>
+                        <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'code')">+ Kode</button>
+                        <button class="btn-case-admin" onclick="addSubBlock(${proj.id}, ${sec.id}, 'media')">+ File</button>
                         <button class="btn btn-secondary btn-sm" style="color:#ff5f56" onclick="removeCaseSection(${proj.id}, ${sec.id})"><i class="fas fa-trash"></i></button>
                     </div>
                 ` : ''}
@@ -721,6 +732,32 @@ function removeSubBlock(pId, sId, bIdx) {
     if(sec && confirm("Hapus blok ini?")) {
         sec.blocks.splice(bIdx, 1);
         renderCaseStudy();
+    }
+}
+
+function moveSubBlock(pId, sId, bIdx, dir) {
+    const proj = projectsData.find(p => p.id === pId);
+    const sec = proj?.caseStudy?.sections?.find(s => s.id === sId);
+    if(sec) {
+        const targetIdx = bIdx + dir;
+        if(targetIdx >= 0 && targetIdx < sec.blocks.length) {
+            const block = sec.blocks.splice(bIdx, 1)[0];
+            sec.blocks.splice(targetIdx, 0, block);
+            renderCaseStudy();
+        }
+    }
+}
+
+function moveCaseSection(pId, sId, dir) {
+    const proj = projectsData.find(p => p.id === pId);
+    if(proj) {
+        const sIdx = proj.caseStudy.sections.findIndex(s => s.id === sId);
+        const targetIdx = sIdx + dir;
+        if(targetIdx >= 0 && targetIdx < proj.caseStudy.sections.length) {
+            const section = proj.caseStudy.sections.splice(sIdx, 1)[0];
+            proj.caseStudy.sections.splice(targetIdx, 0, section);
+            renderCaseStudy();
+        }
     }
 }
 
