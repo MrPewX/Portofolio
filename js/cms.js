@@ -60,6 +60,14 @@ let projectsData = [
     }
 ];
 
+const defaultCaseStudyTemplate = {
+    hook: "<strong>Role:</strong> <br><br><strong>Timeline:</strong> <br><br><strong>Tools:</strong> <br><br><strong>Problem:</strong> ",
+    research: "<strong>User Persona:</strong> <br><br><strong>Competitor Analysis:</strong> <br><br><strong>User Flow:</strong> ",
+    design: "<strong>Wireframes:</strong> <br><br><strong>Design System:</strong> <br><br><strong>High-Fidelity:</strong> ",
+    challenge: "<strong>Tantangan:</strong> <br><br><strong>Solusi:</strong> <br><br><strong>Snippet Kode:</strong><br><pre></pre>",
+    result: "<strong>Fitur Utama:</strong> <br><br><strong>Apa yang Saya Pelajari:</strong> "
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
     await initContent();
     renderProjects();
@@ -120,6 +128,8 @@ async function initContent() {
                 const def = projectsData.find(dp => dp.id === sp.id);
                 if(def && def.caseStudy) {
                     sp.caseStudy = def.caseStudy;
+                } else {
+                    sp.caseStudy = JSON.parse(JSON.stringify(defaultCaseStudyTemplate));
                 }
             }
         });
@@ -132,7 +142,11 @@ async function initContent() {
                 parsed.forEach(sp => {
                     if(!sp.caseStudy || !sp.caseStudy.hook) {
                         const def = projectsData.find(dp => dp.id === sp.id);
-                        if(def && def.caseStudy) sp.caseStudy = def.caseStudy;
+                        if(def && def.caseStudy) {
+                            sp.caseStudy = def.caseStudy;
+                        } else {
+                            sp.caseStudy = JSON.parse(JSON.stringify(defaultCaseStudyTemplate));
+                        }
                     }
                 });
                 projectsData = parsed;
@@ -284,13 +298,7 @@ function enableEditMode() {
             context: "Deskripsi konteks di sini.",
             process: "Langkah-langkah di sini.",
             linkDemo: "#",
-            caseStudy: {
-                hook: "<strong>Role:</strong> [Tulis Peran]<br><br><strong>Timeline:</strong> [Waktu]<br><br><strong>Tools:</strong> [Sebutkan Tools]<br><br><strong>Problem:</strong> [Jelaskan Masalahnya]",
-                research: "<strong>User Persona:</strong> [Siapa target penggunanya]<br><br><strong>Competitor Analysis:</strong> [Kelebihan webmu]<br><br><strong>User Flow:</strong> [Diagram atau Alur]",
-                design: "<strong>Wireframes:</strong> [Penjelasan sketsa]<br><br><strong>Design System:</strong> [Warna, Tipe]<br><br><strong>High-Fidelity:</strong> [Tampilan akhir]",
-                challenge: "<strong>Tantangan:</strong> [Apa kesulitannya]<br><br><strong>Solusi:</strong> [Bagaimana menyelesaikannya]<br><br><strong>Snippet Kode:</strong><br><pre>// [Tulis kode]</pre>",
-                result: "<strong>Fitur Utama:</strong> [Daftar fitur]<br><br><strong>Apa yang Saya Pelajari:</strong> [Kesimpulan]"
-            }
+            caseStudy: JSON.parse(JSON.stringify(defaultCaseStudyTemplate))
         });
         renderProjects();
     });
