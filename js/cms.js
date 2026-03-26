@@ -73,11 +73,52 @@ const defaultCaseStudyTemplate = {
 document.addEventListener('DOMContentLoaded', async () => {
     await initContent();
     renderProjects();
+    
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+    
     if(window.location.pathname.includes('project.html')) {
         renderCaseStudy();
+        if(isAdmin) {
+            const adminPanel = document.getElementById('admin-panel');
+            if(adminPanel) adminPanel.classList.remove('hidden');
+            
+            const saveBtn = document.getElementById('save-case-study-btn');
+            if(saveBtn) {
+                saveBtn.addEventListener('click', async () => {
+                    const pId = getQueryId();
+                    const proj = projectsData.find(p => p.id === pId);
+                    if(proj && proj.caseStudy && proj.caseStudy.sections) {
+                        proj.title = document.getElementById('cs-title').innerText;
+                        proj.caseStudy.sections.forEach(sec => {
+                            const contentEl = document.getElementById(`cs-content-${sec.id}`);
+                            const titleEl = document.getElementById(`cs-title-${sec.id}`);
+                            if(contentEl) sec.content = contentEl.innerHTML;
+                            if(titleEl) sec.title = titleEl.innerText;
+                        });
+                        localStorage.setItem('portfolio_projects', JSON.stringify(projectsData));
+                        saveBtn.innerText = "Menyimpan...";
+                        let payloadDrive = { projects: projectsData };
+                        document.querySelectorAll('[data-edit-id]').forEach(el => {
+                            const key = el.getAttribute('data-edit-id');
+                            payloadDrive[key] = localStorage.getItem('portfolio_' + key);
+                        });
+                        if(GAS_URL !== "") {
+                            try {
+                                await fetch(GAS_URL, {
+                                    method: 'POST', mode: 'no-cors',
+                                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                                    body: JSON.stringify(payloadDrive)
+                                });
+                                alert("Case Study Tersimpan ke Drive!");
+                            } catch(e) { alert("Gagal konek Drive API. Tersimpan lokal."); }
+                        }
+                        saveBtn.innerText = "Simpan Detail";
+                    }
+                });
+            }
+        }
     }
 
-    const isAdmin = localStorage.getItem('isAdmin') === 'true';
     if(isAdmin) {
         enableEditMode();
     }
@@ -482,55 +523,8 @@ function changeDemoLink(id) {
 }
 
 // ============== CASE STUDY PAGE FUNCTIONS ==============
-document.addEventListener('DOMContentLoaded', () => {
-    // Only run if on project.html
-    if(window.location.pathname.includes('project.html')) {
-        if(localStorage.getItem('isAdmin') === 'true') {
-            document.getElementById('admin-panel').classList.remove('hidden');
-            
-            document.getElementById('save-case-study-btn').addEventListener('click', async () => {
-                const btn = document.getElementById('save-case-study-btn');
-                const pId = getQueryId();
-                const proj = projectsData.find(p => p.id === pId);
-                
-                if(proj && proj.caseStudy && proj.caseStudy.sections) {
-                    proj.title = document.getElementById('cs-title').innerText;
-                    
-                    proj.caseStudy.sections.forEach(sec => {
-                        const contentEl = document.getElementById(`cs-content-${sec.id}`);
-                        const titleEl = document.getElementById(`cs-title-${sec.id}`);
-                        if(contentEl) sec.content = contentEl.innerHTML;
-                        if(titleEl) sec.title = titleEl.innerText;
-                    });
-                    
-                    localStorage.setItem('portfolio_projects', JSON.stringify(projectsData));
-                    btn.innerText = "Menyimpan...";
-                    
-                    let payloadDrive = { projects: projectsData };
-                    document.querySelectorAll('[data-edit-id]').forEach(el => {
-                        const key = el.getAttribute('data-edit-id');
-                        payloadDrive[key] = localStorage.getItem('portfolio_' + key);
-                    });
+// Logic migrated to main DOMContentLoaded listener at the top
 
-                    if(GAS_URL !== "") {
-                        try {
-                            await fetch(GAS_URL, {
-                                method: 'POST',
-                                mode: 'no-cors',
-                                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                                body: JSON.stringify(payloadDrive)
-                            });
-                            alert("Case Study Tersimpan ke Drive!");
-                        } catch(e) {
-                            alert("Gagal konek Drive API. Tersimpan lokal.");
-                        }
-                    }
-                    btn.innerText = "Simpan Detail";
-                }
-            });
-        }
-    }
-});
 
 function getQueryId() {
     const params = new URLSearchParams(window.location.search);
